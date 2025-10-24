@@ -55,22 +55,20 @@ import ReactDOM from 'react-dom/client';
 // --- Helper Functions ---
 const normalizeFatwa = (item) => {
   const newItem = { ...item };
-  // Map 'text' to 'answer' for consistency across API endpoints.
+  // 1. توحيد مفتاح الجواب
   if (newItem.text && !newItem.answer) {
     newItem.answer = newItem.text;
     delete newItem.text;
   }
 
-  // Extract numeric ID from the source URL (e.g., "fatwa_12345.html") to use as the canonical ID.
-  // This resolves data inconsistencies where the `id` field differs from the source URL.
+  // 2. استخراج المعرف الأساسي (ID) من حقل المصدر (Source)
   if (newItem.source) {
-    const match = newItem.source.match(/\d+/);
-    if (match && match[0]) {
-      const sourceId = parseInt(match[0], 10);
-      if (!isNaN(sourceId)) {
-        newItem.id = sourceId;
-      }
+    const match = newItem.source.match(/fatwa_(\d+)\.html/);
+    if (match && match[1]) {
+      newItem.id = match[1]; 
     }
+  } else if (newItem.id) {
+    newItem.id = String(newItem.id);
   }
   return newItem;
 };
@@ -81,7 +79,8 @@ const API_BASE_URL = 'https://g85b062bd5c6cb1-fatwaproject.adb.me-dubai-1.oracle
 const API_ID_LOOKUP_BASE_URL = 'https://g85b062bd5c6cb1-fatwaproject.adb.me-dubai-1.oraclecloudapps.com/ords/SUFEAN/fatwas/search_source/';
 const RANDOM_SEARCH_TERMS = ['الصلاة', 'الزكاة', 'الحج', 'الصوم', 'الطلاق', 'الزواج'];
 
-// --- Icon Components ---
+// --- Icon Components (No change needed) ---
+
 const SearchIcon = ({ className }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -144,7 +143,7 @@ const CheckIcon = ({ className }) => (
 );
 
 
-// --- Other Components ---
+// --- Other Components (No change needed) ---
 
 const LoadingSpinner = () => (
   <div className="flex justify-center items-center p-8">
@@ -245,12 +244,27 @@ const FatwaDetail = ({ fatwa, onIdClick, onBack, relatedFatwas, onRelatedFatwaSe
 
   const handleCopy = () => {
     const textToCopy = `السؤال: ${fatwa.question}\n\nالجواب: ${fatwa.answer}\n\nالمصدر: ${fatwa.source}`;
-    navigator.clipboard.writeText(textToCopy).then(() => {
-        setCopyStatus('copied');
-        setTimeout(() => setCopyStatus('idle'), 2000);
-    }).catch(err => {
-        console.error('Failed to copy text: ', err);
-    });
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            setCopyStatus('copied');
+            setTimeout(() => setCopyStatus('idle'), 2000);
+        }).catch(err => {
+            console.error('Failed to copy text using clipboard API: ', err);
+        });
+    } else {
+        const textarea = document.createElement('textarea');
+        textarea.value = textToCopy;
+        document.body.appendChild(textarea);
+        textarea.select();
+        try {
+            document.execCommand('copy');
+            setCopyStatus('copied');
+            setTimeout(() => setCopyStatus('idle'), 2000);
+        } catch (err) {
+            console.error('Failed to copy text using execCommand: ', err);
+        }
+        document.body.removeChild(textarea);
+    }
   };
 
   const handleShare = () => {
@@ -262,7 +276,6 @@ const FatwaDetail = ({ fatwa, onIdClick, onBack, relatedFatwas, onRelatedFatwaSe
         }).catch(error => console.log('Error sharing', error));
     } else {
         handleCopy();
-        alert('تم نسخ الفتوى إلى الحافظة لمشاركتها.');
     }
   };
 
@@ -271,14 +284,16 @@ const FatwaDetail = ({ fatwa, onIdClick, onBack, relatedFatwas, onRelatedFatwaSe
         return <span className="text-gray-500 italic">لا يتوفر جواب لهذه الفتوى حالياً.</span>;
     }
 
+    // يبحث عن الأرقام التي قد تكون معرفات فتاوى داخلية [123] أو 12345
     const regex = /(\[\d+\]|\b\d{3,}\b)/g;
     const parts = text.split(regex);
 
     return parts.map((part, index) => {
+      // الأجزاء ذات الأرقام تكون في المواقع الفردية (1, 3, 5, ...)
       if (index % 2 === 1) {
         const numberString = part.replace(/\D/g, '');
-        const fatwaId = parseInt(numberString, 10);
-        if (!isNaN(fatwaId)) {
+        const fatwaId = numberString; 
+        if (fatwaId) {
           return (
             <a
               key={index}
@@ -295,6 +310,7 @@ const FatwaDetail = ({ fatwa, onIdClick, onBack, relatedFatwas, onRelatedFatwaSe
         }
       }
 
+      // تقسيم النصوص العادية بواسطة سطر جديد للحفاظ على التنسيق
       return part.split('\n').map((line, i) => (
         <React.Fragment key={`${index}-${i}`}>
             {line}
@@ -463,7 +479,7 @@ const App = () => {
     try {
         const response = await fetch(`${API_BASE_URL}${encodeURIComponent(query)}`);
         const data = await response.json();
-        const items = (data.items || []).map(normalizeFatwa);
+        const items = (data.items || []).map(normalizeFatwa); 
         const filteredItems = items.filter(item => item.id !== fatwa.id).slice(0, 5);
         setRelatedFatwas(filteredItems);
     } catch (err) {
@@ -487,13 +503,18 @@ const App = () => {
             setIsLoading(false);
             return;
         }
-        const targetId = parseInt(numericQuery, 10);
+        const targetId = numericQuery; 
         
         try {
             const directLookupUrl = `${API_ID_LOOKUP_BASE_URL}${targetId}`;
             const response = await fetch(directLookupUrl);
 
             if (!response.ok) {
+                if (response.status === 404) {
+                     setError(`لم يتم العثور على فتوى بالمعرف المحدد (${targetId}). قد يكون الرقم غير صحيح أو أن الفتوى غير متوفرة.`);
+                     setSelectedFatwa(null);
+                     return;
+                }
                 throw new Error(`خطأ في الشبكة: ${response.statusText}`);
             }
 
@@ -501,7 +522,7 @@ const App = () => {
             const rawItems = data.items || [];
             
             if (rawItems.length > 0) {
-                const foundFatwa = normalizeFatwa(rawItems[0]);
+                const foundFatwa = normalizeFatwa(rawItems[0]); 
                 setSelectedFatwa(foundFatwa);
                 await fetchRelatedFatwas(foundFatwa);
             } else {
@@ -511,7 +532,7 @@ const App = () => {
 
         } catch (err) {
             if (err instanceof Error) {
-                setError(err.message);
+                setError(`حدث خطأ: ${err.message}`);
             } else {
                 setError('حدث خطأ غير متوقع عند جلب الفتوى');
             }
@@ -547,7 +568,7 @@ const App = () => {
 
     } catch (err) {
       if (err instanceof Error) {
-        setError(err.message);
+        setError(`حدث خطأ: ${err.message}`);
       } else {
         setError('حدث خطأ غير متوقع عند البحث');
       }
@@ -558,13 +579,10 @@ const App = () => {
   }, [fetchRelatedFatwas]);
 
 
-// ... نهاية دالة fetchFatwas ...
-  }, [fetchRelatedFatwas]); 
-
 // ***************************************************************
-// 👈 هنا يبدأ كود useEffect الجديد (المسؤول عن زر العودة)
+// 👈 معالج سجل التصفح (History API) المصحح
 // ***************************************************************
-useEffect(() => {
+  useEffect(() => {
     const handlePopState = () => {
       const pathParts = window.location.pathname.split("/");
       const fatwaIndex = pathParts.indexOf("fatwa");
@@ -582,73 +600,89 @@ useEffect(() => {
               const id = lastPart.replace('fatwa_', '').replace('.html', '').replace(/\D/g, "");
               if (id) {
                   idFromPath = id;
+                  // تصحيح الرابط في المتصفح فوراً إذا تم تحميل رابط HTML قديم
                   window.history.replaceState({}, '', `/fatawa/fatwa/${id}/`);
               }
           }
       }
 
       if (idFromPath) {
+        // إذا وجدنا ID، نحمل الفتوى ونعرضها
         fetchFatwas(idFromPath, true); 
       } else {
+        // إذا لم نجد ID، نعود لعرض القائمة
         setSelectedFatwa(null);
         setRelatedFatwas([]);
         setListTitle('فتاوى مختارة');
-        if (fatwas.length === 0) { 
-          const randomTerm = RANDOM_SEARCH_TERMS[Math.floor(Math.random() * RANDOM_SEARCH_TERMS.length)];
-          fetchFatwas(randomTerm);
-        }
+        // *** تم إزالة المنطق الزائد هنا ***
       }
     };
 
     window.addEventListener('popstate', handlePopState);
-    handlePopState(); 
+    handlePopState(); // لتشغيل عند التحميل الأولي للصفحة (سواء من الرابط النظيف أو زر العودة)
 
     return () => {
       window.removeEventListener('popstate', handlePopState);
     };
-  }, [fetchFatwas, fatwas]); // 👈 **الأهم:** إضافة fatwas
+    // ** تم تغيير الاعتمادية إلى [fetchFatwas] فقط لمنع التضارب **
+  }, [fetchFatwas]); 
+
 
 // ***************************************************************
-// 👈 هنا يستمر الـ useEffect القديم (لتحميل البداية)
+// 👈 تحميل الفتاوى المختارة عند بدء التشغيل (الـ useEffect الأصلي)
+// ***************************************************************
   useEffect(() => {
-    const randomTerm = RANDOM_SEARCH_TERMS[Math.floor(Math.random() * RANDOM_SEARCH_TERMS.length)];
-    setListTitle('فتاوى مختارة');
-    fetchFatwas(randomTerm);
-  }, []);
+    // نتحقق مما إذا كان هناك فتوى محددة في الـ URL (للتأكد من أن popstate لم يجد ID)
+    if (window.location.pathname.indexOf("fatwa") === -1) {
+        const randomTerm = RANDOM_SEARCH_TERMS[Math.floor(Math.random() * RANDOM_SEARCH_TERMS.length)];
+        setListTitle('فتاوى مختارة');
+        fetchFatwas(randomTerm);
+    } else {
+        setIsLoading(false);
+    }
+  }, []); // لا يوجد اعتماديات لكي يتم التنفيذ مرة واحدة فقط
 
-  
-// ... تكملة باقي الدوال ...
+
+// ***************************************************************
+// 👈 الدوال المُعدلة لتسجيل الرابط في History API
+// ***************************************************************
   const handleSearch = (query) => {
     setListTitle(`نتائج البحث عن: "${query}"`);
     fetchFatwas(query);
-    window.history.pushState({}, '', '/fatawa/'); // 👈 تم التعديل
+    // تسجيل رابط الجذر عند البحث
+    window.history.pushState({}, 'نتائج البحث', '/fatawa/'); 
   };
 
   const handleFatwaSelect = (fatwa) => {
     setSelectedFatwa(fatwa);
     fetchRelatedFatwas(fatwa);
-    window.history.pushState({}, fatwa.question, `/fatawa/fatwa/${fatwa.id}/`); // 👈 تم التعديل
+    // تسجيل الفتوى في شريط العنوان
+    window.history.pushState({}, fatwa.question, `/fatawa/fatwa/${fatwa.id}/`);
     window.scrollTo(0, 0);
   };
   
   const handleIdClick = (id) => {
     fetchFatwas(id.toString(), true);
-    window.history.pushState({}, '', `/fatawa/fatwa/${id}/`); // 👈 تم التعديل
+    // تسجيل الفتوى في شريط العنوان
+    window.history.pushState({}, '', `/fatawa/fatwa/${id}/`);
     window.scrollTo(0, 0);
   };
 
   const handleRelatedFatwaSelect = (fatwa) => {
     setSelectedFatwa(fatwa);
     fetchRelatedFatwas(fatwa);
-    window.history.pushState({}, fatwa.question, `/fatawa/fatwa/${fatwa.id}/`); // 👈 تم التعديل
+    // تسجيل الفتوى في شريط العنوان
+    window.history.pushState({}, fatwa.question, `/fatawa/fatwa/${fatwa.id}/`);
     window.scrollTo(0, 0);
   };
 
   const handleBackToList = () => {
     setSelectedFatwa(null);
     setRelatedFatwas([]);
-    window.history.pushState({}, 'موسوعة الفتاوى', '/fatawa/'); // 👈 تم التعديل
+    // العودة إلى رابط الجذر في المتصفح
+    window.history.pushState({}, 'موسوعة الفتاوى', '/fatawa/');
   };
+
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 transition-colors duration-300">
