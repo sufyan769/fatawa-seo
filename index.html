@@ -1,57 +1,133 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <title>موسوعة الفتاوى - البحث</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        body { font-family: Tahoma, sans-serif; background-color: #f4f4f9; color: #333; text-align: right; }
-        .container { max-width: 800px; margin: 50px auto; padding: 20px; background: #fff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        h1 { color: #007bff; border-bottom: 2px solid #007bff; padding-bottom: 10px; }
-        .search-box { display: flex; margin-bottom: 20px; }
-        .search-box input { flex-grow: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px 0 0 4px; font-size: 16px; text-align: right; }
-        .search-box button { padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 0 4px 4px 0; cursor: pointer; font-size: 16px; }
-        .results { margin-top: 20px; }
-        .results p { font-size: 1.1em; color: #666; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>موسوعة الفتاوى | البحث في أكثر من 250 ألف فتوى شرعية</title>
+  <meta name="description" content="موسوعة فتاوى شرعية موثوقة — ابحث في أكثر من 250 ألف فتوى لأشهر العلماء مثل ابن باز وابن عثيمين واللجنة الدائمة.">
+  <meta name="keywords" content="فتاوى, إسلام ويب, ابن باز, ابن عثيمين, فتاوى شرعية, بحث في الفتاوى, موسوعة الفتاوى, أحكام شرعية, الفقه الإسلامي">
+  <meta name="robots" content="index, follow">
+  <meta property="og:title" content="موسوعة الفتاوى الإسلامية">
+  <meta property="og:description" content="ابحث بسهولة بين آلاف الفتاوى الموثوقة من كبار العلماء.">
+  <meta property="og:url" content="https://fatawa.netlify.app/">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/3212/3212650.png">
+
+  <style>
+    body {
+      font-family: 'Tahoma', sans-serif;
+      background: linear-gradient(135deg, #e8f0ff, #ffffff);
+      margin: 0;
+      padding: 0;
+      color: #333;
+      text-align: center;
+    }
+    header {
+      background-color: #007bff;
+      color: #fff;
+      padding: 40px 10px 30px;
+      border-bottom: 5px solid #0056b3;
+    }
+    header h1 {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+    }
+    header p {
+      font-size: 1.2em;
+      color: #f1f1f1;
+    }
+    .container {
+      max-width: 700px;
+      background: #fff;
+      margin: 40px auto;
+      border-radius: 10px;
+      padding: 25px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    }
+    .search-box {
+      display: flex;
+      border: 2px solid #007bff;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    input[type="text"] {
+      flex: 1;
+      padding: 14px;
+      font-size: 16px;
+      border: none;
+      outline: none;
+      text-align: right;
+    }
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 0 25px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .results {
+      color: #444;
+      font-size: 1.1em;
+    }
+    footer {
+      background-color: #f8f9fa;
+      padding: 20px;
+      font-size: 0.9em;
+      color: #555;
+      margin-top: 50px;
+      border-top: 1px solid #ddd;
+    }
+    a {
+      color: #007bff;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>البحث في موسوعة الفتاوى</h1>
+  <header>
+    <h1>🔍 موسوعة الفتاوى</h1>
+    <p>ابحث في أكثر من 250 ألف فتوى شرعية من العلماء الموثوقين</p>
+  </header>
 
-        <div class="search-box">
-            <button onclick="searchFatawa()">ابحث</button>
-            <input type="text" id="searchInput" placeholder="اكتب رقم الفتوى (مثل fatwa_1234.html)">
-        </div>
-
-        <div class="results" id="searchResults">
-            <p>يمكنك البحث برقم الفتوى للوصول المباشر للصفحة.</p>
-        </div>
+  <div class="container">
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="اكتب رقم الفتوى مثل: fatwa_1234.html">
+      <button onclick="searchFatawa()">ابحث</button>
     </div>
+    <div class="results" id="searchResults">
+      <p>يمكنك البحث برقم الفتوى للوصول مباشرة إلى صفحتها.</p>
+      <p>أو تصفح خريطة الموقع: <a href="sitemap_index.xml" target="_blank">عرض خريطة الفتاوى</a></p>
+    </div>
+  </div>
 
-    <script>
-        function searchFatawa() {
-            const input = document.getElementById('searchInput').value.trim();
-            const resultsDiv = document.getElementById('searchResults');
+  <footer>
+    <p>© 2025 موسوعة الفتاوى | تصميم وبناء: <a href="https://github.com/sufyan769" target="_blank">سفيان الدوري</a></p>
+  </footer>
 
-            if (input === "") {
-                resultsDiv.innerHTML = '<p style="color: red;">الرجاء إدخال رقم الفتوى أو كلمة للبحث.</p>';
-                return;
-            }
+  <script>
+    function searchFatawa() {
+      const input = document.getElementById('searchInput').value.trim();
+      const resultsDiv = document.getElementById('searchResults');
 
-            // الافتراض هنا أن الملفات داخل مجلد 'fatwa_pages/'
-            // وأن العناوين تتضمن اسم الملف كاملاً مثل fatwa_1234.html
-            
-            const link = `fatwa_pages/${input}`;
+      if (input === "") {
+        resultsDiv.innerHTML = '<p style="color:red;">الرجاء إدخال رقم الفتوى أو اسم الملف.</p>';
+        return;
+      }
 
-            // محاولة الانتقال المباشر إلى الصفحة
-            window.location.href = link;
-            
-            // لعرض رسالة انتظار/نتيجة (لن تظهر فعليا لأن الصفحة ستنتقل)
-            resultsDiv.innerHTML = `<p style="color: green;">جارٍ البحث عن: <strong>${input}</strong>... سيتم توجيهك.</p>`;
-        }
-    </script>
+      // الانتقال المباشر إلى صفحة الفتوى
+      window.location.href = `fatwa_pages/${input}`;
+    }
+  </script>
 
 </body>
 </html>
