@@ -1,133 +1,110 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>موسوعة الفتاوى | البحث في أكثر من 250 ألف فتوى شرعية</title>
-  <meta name="description" content="موسوعة فتاوى شرعية موثوقة — ابحث في أكثر من 250 ألف فتوى لأشهر العلماء مثل ابن باز وابن عثيمين واللجنة الدائمة.">
-  <meta name="keywords" content="فتاوى, إسلام ويب, ابن باز, ابن عثيمين, فتاوى شرعية, بحث في الفتاوى, موسوعة الفتاوى, أحكام شرعية, الفقه الإسلامي">
-  <meta name="robots" content="index, follow">
-  <meta property="og:title" content="موسوعة الفتاوى الإسلامية">
-  <meta property="og:description" content="ابحث بسهولة بين آلاف الفتاوى الموثوقة من كبار العلماء.">
-  <meta property="og:url" content="https://fatawa.netlify.app/">
-  <meta property="og:type" content="website">
-  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/3212/3212650.png">
-
-  <style>
-    body {
-      font-family: 'Tahoma', sans-serif;
-      background: linear-gradient(135deg, #e8f0ff, #ffffff);
-      margin: 0;
-      padding: 0;
-      color: #333;
-      text-align: center;
-    }
-    header {
-      background-color: #007bff;
-      color: #fff;
-      padding: 40px 10px 30px;
-      border-bottom: 5px solid #0056b3;
-    }
-    header h1 {
-      font-size: 2.5em;
-      margin-bottom: 10px;
-    }
-    header p {
-      font-size: 1.2em;
-      color: #f1f1f1;
-    }
-    .container {
-      max-width: 700px;
-      background: #fff;
-      margin: 40px auto;
-      border-radius: 10px;
-      padding: 25px;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-    }
-    .search-box {
-      display: flex;
-      border: 2px solid #007bff;
-      border-radius: 8px;
-      overflow: hidden;
-      margin-bottom: 20px;
-    }
-    input[type="text"] {
-      flex: 1;
-      padding: 14px;
-      font-size: 16px;
-      border: none;
-      outline: none;
-      text-align: right;
-    }
-    button {
-      background-color: #007bff;
-      color: white;
-      border: none;
-      padding: 0 25px;
-      cursor: pointer;
-      font-size: 16px;
-      transition: background-color 0.3s;
-    }
-    button:hover {
-      background-color: #0056b3;
-    }
-    .results {
-      color: #444;
-      font-size: 1.1em;
-    }
-    footer {
-      background-color: #f8f9fa;
-      padding: 20px;
-      font-size: 0.9em;
-      color: #555;
-      margin-top: 50px;
-      border-top: 1px solid #ddd;
-    }
-    a {
-      color: #007bff;
-      text-decoration: none;
-    }
-    a:hover {
-      text-decoration: underline;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>موسوعة الفتاوى - بحث Oracle Cloud</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: Tahoma, sans-serif; background-color: #f4f4f9; color: #333; text-align: right; }
+        .container { max-width: 800px; margin: 50px auto; padding: 20px; background: #fff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        h1 { color: #2196F3; border-bottom: 2px solid #2196F3; padding-bottom: 10px; }
+        .search-box { display: flex; margin-bottom: 20px; }
+        .search-box input { flex-grow: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px 0 0 4px; font-size: 16px; text-align: right; }
+        .search-box button { padding: 10px 20px; background-color: #2196F3; color: white; border: none; border-radius: 0 4px 4px 0; cursor: pointer; font-size: 16px; transition: background-color 0.3s; }
+        .search-box button:hover { background-color: #1976D2; }
+        .results { margin-top: 20px; }
+        .result-item { border-bottom: 1px dashed #eee; padding: 10px 0; }
+        .result-item a { font-size: 1.1em; color: #00796B; text-decoration: none; font-weight: bold; }
+        .result-item a:hover { text-decoration: underline; }
+        .error { color: red; }
+    </style>
 </head>
 <body>
 
-  <header>
-    <h1>🔍 موسوعة الفتاوى</h1>
-    <p>ابحث في أكثر من 250 ألف فتوى شرعية من العلماء الموثوقين</p>
-  </header>
+    <div class="container">
+        <h1>البحث الفوري في موسوعة الفتاوى (Oracle Cloud)</h1>
 
-  <div class="container">
-    <div class="search-box">
-      <input type="text" id="searchInput" placeholder="اكتب رقم الفتوى مثل: fatwa_1234.html">
-      <button onclick="searchFatawa()">ابحث</button>
+        <div class="search-box">
+            <button onclick="searchFatawa()" id="searchButton">ابحث</button>
+            <input type="text" id="searchInput" placeholder="اكتب كلمات للبحث في محتوى الفتوى..." onkeypress="if(event.key === 'Enter') searchFatawa()">
+        </div>
+
+        <div class="results" id="searchResults">
+            <p>النتائج ستظهر هنا فورياً بعد البحث.</p>
+        </div>
     </div>
-    <div class="results" id="searchResults">
-      <p>يمكنك البحث برقم الفتوى للوصول مباشرة إلى صفحتها.</p>
-      <p>أو تصفح خريطة الموقع: <a href="sitemap_index.xml" target="_blank">عرض خريطة الفتاوى</a></p>
-    </div>
-  </div>
 
-  <footer>
-    <p>© 2025 موسوعة الفتاوى | تصميم وبناء: <a href="https://github.com/sufyan769" target="_blank">سفيان الدوري</a></p>
-  </footer>
+    <script>
+        // *** قم بتغيير هذه القيم إذا تغيرت عناوين الأعمدة في Oracle ***
+        const ORACLE_API_BASE = 'https://g85b062bd5c6cb1-fatwaproject.adb.me-dubai-1.oraclecloudapps.com/ords/SUFEAN/fatwas/search_source/';
+        const GITHUB_PAGES_BASE = 'https://sufyan769.github.io/fatawa/';
+        const FATWA_FOLDER = 'fatwa_pages/';
+        
+        // المفترض أن Oracle يرجع اسم الفتوى في عمود اسمه 'name' ورابطها في عمود اسمه 'link'
+        const RESULT_NAME_KEY = 'name'; 
+        const RESULT_LINK_KEY = 'link'; 
+        // ----------------------------------------------------------------------
 
-  <script>
-    function searchFatawa() {
-      const input = document.getElementById('searchInput').value.trim();
-      const resultsDiv = document.getElementById('searchResults');
 
-      if (input === "") {
-        resultsDiv.innerHTML = '<p style="color:red;">الرجاء إدخال رقم الفتوى أو اسم الملف.</p>';
-        return;
-      }
+        async function searchFatawa() {
+            const inputElement = document.getElementById('searchInput');
+            const searchInput = inputElement.value.trim();
+            const resultsDiv = document.getElementById('searchResults');
+            const button = document.getElementById('searchButton');
 
-      // الانتقال المباشر إلى صفحة الفتوى
-      window.location.href = `fatwa_pages/${input}`;
-    }
-  </script>
+            if (searchInput.length < 2) {
+                resultsDiv.innerHTML = '<p class="error">الرجاء إدخال كلمتين على الأقل للبحث.</p>';
+                return;
+            }
+
+            button.disabled = true;
+            button.textContent = 'جارٍ البحث...';
+            resultsDiv.innerHTML = '<p>يتم جلب النتائج من Oracle Cloud...</p>';
+
+            try {
+                // نستخدم encodeURIComponent لترميز النص العربي في الرابط
+                const apiUrl = ORACLE_API_BASE + encodeURIComponent(searchInput);
+                
+                const response = await fetch(apiUrl);
+                if (!response.ok) {
+                    throw new Error(`خطأ في استجابة Oracle: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                const items = data.items || []; // افترض أن النتائج تأتي في صفيف باسم 'items'
+
+                if (items.length === 0) {
+                    resultsDiv.innerHTML = `<p>لم يتم العثور على نتائج للكلمة: <strong>${searchInput}</strong>.</p>`;
+                    return;
+                }
+
+                let html = '<h2>نتائج البحث (' + items.length + '):</h2>';
+                items.forEach(item => {
+                    // نفترض أن API يرجع عنوان الفتوى ورابط الملف
+                    const fatwaTitle = item[RESULT_NAME_KEY] || 'فتوى بدون عنوان';
+                    const fatwaLink = item[RESULT_LINK_KEY]; // يجب أن يكون هذا اسم الملف مثل fatwa_1.html
+
+                    // بناء الرابط كاملاً للصفحة على GitHub Pages
+                    const fullUrl = GITHUB_PAGES_BASE + FATWA_FOLDER + fatwaLink;
+
+                    html += `
+                        <div class="result-item">
+                            <a href="${fullUrl}" target="_blank">${fatwaTitle}</a>
+                        </div>
+                    `;
+                });
+
+                resultsDiv.innerHTML = html;
+
+            } catch (error) {
+                resultsDiv.innerHTML = `<p class="error">حدث خطأ أثناء البحث: ${error.message}. يرجى التحقق من API Oracle.</p>`;
+                console.error("Fetch Error:", error);
+            } finally {
+                button.disabled = false;
+                button.textContent = 'ابحث';
+            }
+        }
+    </script>
 
 </body>
 </html>
