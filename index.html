@@ -539,29 +539,53 @@ const App = () => {
 
 useEffect(() => {
   const handlePopState = () => {
-    // نحتاج إلى /fatawa/fatwa/ID/
     const pathParts = window.location.pathname.split("/");
-    const fatwaIndex = pathParts.indexOf("fatwa");
+    // البحث عن 'fatwa' في المسار
+    const fatwaIndex = pathParts.indexOf("fatwa"); 
     let idFromPath = null;
+    let isHtmlFile = false; // لمسارات fatwa_ID.html
 
-    // *** التعديل المهم هنا: نبحث فقط عن المسار بدون # ***
+    // 1. فحص المسار النظيف: /fatawa/fatwa/ID/
     if (fatwaIndex !== -1 && pathParts[fatwaIndex + 1]) {
       const id = pathParts[fatwaIndex + 1].replace(/\D/g, "");
       if (id) idFromPath = id;
+    } 
+    
+    // 2. فحص مسار الملف القديم: /fatwa_ID.html
+    // هذا مهم عندما يبحث جوجل ويضغط المستخدم على رابط قديم
+    else if (pathParts.length > 1) {
+        const lastPart = pathParts[pathParts.length - 1];
+        if (lastPart.startsWith('fatwa_') && lastPart.endsWith('.html')) {
+            const id = lastPart.replace('fatwa_', '').replace('.html', '').replace(/\D/g, "");
+            if (id) {
+                idFromPath = id;
+                isHtmlFile = true;
+            }
+        }
     }
-    // **********************************************
+
 
     // 🔹 تحميل الفتوى المطلوبة أو عرض الصفحة الرئيسية
     if (idFromPath) {
-      fetchFatwas(idFromPath, true);
+      // إذا كان مسار ملف قديم، قم بتنظيف الرابط في شريط المتصفح ليتوافق مع SPA
+      if (isHtmlFile) {
+           window.history.replaceState({}, '', `/fatawa/fatwa/${idFromPath}/`);
+      }
+      // تحميل الفتوى عبر API
+      fetchFatwas(idFromPath, true); 
     } else {
+      // إذا لم يكن هناك ID في الرابط (أي تم الانتقال إلى الصفحة الرئيسية)
       setSelectedFatwa(null);
+      setRelatedFatwas([]);
+      setListTitle('فتاوى مختارة');
+      
+      // تحميل فتاوى مختارة عند العودة إلى الصفحة الرئيسية الفارغة
       if (fatwas.length === 0) {
         const randomTerm = RANDOM_SEARCH_TERMS[Math.floor(Math.random() * RANDOM_SEARCH_TERMS.length)];
-        setListTitle('فتاوى مختارة');
         fetchFatwas(randomTerm);
       }
     }
+    // **********************************************
   };
 
   window.addEventListener('popstate', handlePopState);
@@ -570,8 +594,7 @@ useEffect(() => {
   return () => {
     window.removeEventListener('popstate', handlePopState);
   };
-}, [fetchFatwas]);
-
+}, [fetchFatwas]); // يجب تضمين fetchFatwas هنا ليعمل useEffect بشكل صحيح.
 
   const handleSearch = (query) => {
     setListTitle(`نتائج البحث عن: "${query}"`);
