@@ -161,23 +161,23 @@ const SearchInput = ({ onSearch, isLoading }) => {
     </form>
   );
 };
-
 const FatwaListItem = ({ fatwa, onSelect }) => {
+  // استخراج المعرف الصحيح من المصدر عند عرض القائمة
+  const sourceText = fatwa.source || '';
+  const match = sourceText.match(/fatwa_(\d+)\.html/);
+  const correctId = match ? match[1] : fatwa.id;
+
+  const fatwaWithCorrectId = { ...fatwa, id: correctId };
+
   return (
     <div
-      onClick={() => onSelect(fatwa)}
+      onClick={() => onSelect(fatwaWithCorrectId)} // 👈 تمرير الفتوى بالمعرف الصحيح
       className="py-5 cursor-pointer group"
     >
-      <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors duration-200 line-clamp-2">
-        {fatwa.question}
-      </h3>
-      <span className="text-md text-emerald-600 dark:text-emerald-400 mt-1 inline-block">
-        ... أكمل القراءة
-      </span>
+      {/* ... باقي الكود ... */}
     </div>
   );
 };
-
 const FatwaList = ({ fatwas, onFatwaSelect, title }) => {
   if (fatwas.length === 0) {
     return (
