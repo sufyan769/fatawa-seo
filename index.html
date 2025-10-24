@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>موسوعة الفتاوى - البحث</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: Tahoma, sans-serif; background-color: #f4f4f9; color: #333; text-align: right; }
+        .container { max-width: 800px; margin: 50px auto; padding: 20px; background: #fff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        h1 { color: #007bff; border-bottom: 2px solid #007bff; padding-bottom: 10px; }
+        .search-box { display: flex; margin-bottom: 20px; }
+        .search-box input { flex-grow: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px 0 0 4px; font-size: 16px; text-align: right; }
+        .search-box button { padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 0 4px 4px 0; cursor: pointer; font-size: 16px; }
+        .results { margin-top: 20px; }
+        .results p { font-size: 1.1em; color: #666; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>البحث في موسوعة الفتاوى</h1>
+
+        <div class="search-box">
+            <button onclick="searchFatawa()">ابحث</button>
+            <input type="text" id="searchInput" placeholder="اكتب رقم الفتوى (مثل fatwa_1234.html)">
+        </div>
+
+        <div class="results" id="searchResults">
+            <p>يمكنك البحث برقم الفتوى للوصول المباشر للصفحة.</p>
+        </div>
+    </div>
+
+    <script>
+        function searchFatawa() {
+            const input = document.getElementById('searchInput').value.trim();
+            const resultsDiv = document.getElementById('searchResults');
+
+            if (input === "") {
+                resultsDiv.innerHTML = '<p style="color: red;">الرجاء إدخال رقم الفتوى أو كلمة للبحث.</p>';
+                return;
+            }
+
+            // الافتراض هنا أن الملفات داخل مجلد 'fatwa_pages/'
+            // وأن العناوين تتضمن اسم الملف كاملاً مثل fatwa_1234.html
+            
+            const link = `fatwa_pages/${input}`;
+
+            // محاولة الانتقال المباشر إلى الصفحة
+            window.location.href = link;
+            
+            // لعرض رسالة انتظار/نتيجة (لن تظهر فعليا لأن الصفحة ستنتقل)
+            resultsDiv.innerHTML = `<p style="color: green;">جارٍ البحث عن: <strong>${input}</strong>... سيتم توجيهك.</p>`;
+        }
+    </script>
+
+</body>
+</html>
