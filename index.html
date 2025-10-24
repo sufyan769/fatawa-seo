@@ -594,7 +594,7 @@ useEffect(() => {
   return () => {
     window.removeEventListener('popstate', handlePopState);
   };
-}, [fetchFatwas]); // يجب تضمين fetchFatwas هنا ليعمل useEffect بشكل صحيح.
+}, [fetchFatwas, fatwas]); // 👈 اضف fatwas هنا // يجب تضمين fetchFatwas هنا ليعمل useEffect بشكل صحيح.
 
   const handleSearch = (query) => {
     setListTitle(`نتائج البحث عن: "${query}"`);
