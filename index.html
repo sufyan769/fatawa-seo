@@ -162,7 +162,7 @@ const SearchInput = ({ onSearch, isLoading }) => {
   );
 };
 const FatwaListItem = ({ fatwa, onSelect }) => {
-  // استخراج المعرف الصحيح من المصدر عند عرض القائمة
+  // *** الكود المصحح لاستخراج المعرّف من المصدر ***
   const sourceText = fatwa.source || '';
   const match = sourceText.match(/fatwa_(\d+)\.html/);
   const correctId = match ? match[1] : fatwa.id;
@@ -478,13 +478,13 @@ const App = () => {
             const rawItems = data.items || [];
             
         if (rawItems.length > 0) {
-                // استخراج الرقم من حقل المصدر (مثال: 'fatwa_96030.html' -> 96030)
+                // *** الكود المصحح لاستخراج المعرّف من المصدر ***
                 const sourceText = rawItems[0].source || '';
                 const match = sourceText.match(/fatwa_(\d+)\.html/);
-                const correctId = match ? match[1] : rawItems[0].id; // استخدم ID الأصلي كاحتياطي
+                const correctId = match ? match[1] : rawItems[0].id; // fallback to original ID
 
                 const foundFatwa = {
-                    id: correctId, // 👈 الآن نستخدم المعرف الصحيح
+                    id: correctId, // 👈 استخدم المعرف المستخرج
                     question: rawItems[0].question,
                     answer: rawItems[0].text, 
                     source: rawItems[0].source,
