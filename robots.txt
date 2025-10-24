@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://fatawa.netlify.app/sitemap_index.xml
