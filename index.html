@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
   <head>
@@ -77,8 +76,11 @@ const normalizeFatwa = (item) => {
 const API_BASE_URL = 'https://g85b062bd5c6cb1-fatwaproject.adb.me-dubai-1.oraclecloudapps.com/ords/SUFEAN/fatwas/search/';
 const API_ID_LOOKUP_BASE_URL = 'https://g85b062bd5c6cb1-fatwaproject.adb.me-dubai-1.oraclecloudapps.com/ords/SUFEAN/fatwas/search_source/';
 const RANDOM_SEARCH_TERMS = ['الصلاة', 'الزكاة', 'الحج', 'الصوم', 'الطلاق', 'الزواج'];
+const DEFAULT_TITLE = 'موسوعة الفتاوى';
+const DEFAULT_DESCRIPTION = 'محرك بحث متخصص في الفتاوى الشرعية مع إمكانية التنقل بين الفتاوى المترابطة.';
 
-// --- Icon Components ---
+
+// --- Icon Components (omitted for brevity, assume they are still here) ---
 
 const SearchIcon = ({ className }) => (
   <svg
@@ -330,9 +332,11 @@ const FatwaDetail = ({ fatwa, onIdClick, onBack, relatedFatwas, onRelatedFatwaSe
           </div>
         <div className="border-b-2 border-emerald-500 pb-4 mb-4">
           <p className="text-md text-emerald-600 dark:text-emerald-400 font-bold">معرف الفتوى: {fatwa.id}</p>
+          {/* SEO: Make question the main H1 tag */}
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-2">{fatwa.question}</h1>
         </div>
         <div className="max-w-none text-gray-700 dark:text-gray-300">
+          {/* SEO: Use H2 for the answer title */}
           <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-2">الجواب:</h2>
           <div className={`whitespace-pre-wrap ${fontClasses[fontLevel]} ${lineHeights[fontLevel]}`}>
             {parseAndLinkAnswer(fatwa.answer)}
@@ -416,6 +420,66 @@ const ThemeToggle = ({ theme, toggleTheme }) => {
   );
 };
 
+/**
+ * دالة مساعدة لتحديث علامات الـ SEO في الـ <head>
+ * لأن React لا تتحكم في الـ <head> بشكل مباشر
+ */
+const updateSeoTags = (fatwa) => {
+    const head = document.head;
+
+    // 1. تحديث العنوان (Title)
+    document.title = fatwa 
+        ? `${fatwa.question} | فتاوى رقم ${fatwa.id}`
+        : DEFAULT_TITLE;
+
+    // 2. تحديث الوصف (Meta Description)
+    const description = fatwa 
+        ? fatwa.answer.substring(0, 160).replace(/\n/g, ' ') + '...' 
+        : DEFAULT_DESCRIPTION;
+    
+    let metaDescription = head.querySelector('meta[name="description"]');
+    if (!metaDescription) {
+        metaDescription = document.createElement('meta');
+        metaDescription.name = 'description';
+        head.appendChild(metaDescription);
+    }
+    metaDescription.content = description;
+
+    // 3. إضافة/إزالة JSON-LD Schema Markup
+    let schemaScript = head.querySelector('#fatwa-schema-ld');
+    
+    if (fatwa) {
+        const schemaMarkup = {
+          "@context": "https://schema.org",
+          "@type": "QAPage",
+          "mainEntity": {
+            "@type": "Question",
+            "name": fatwa.question,
+            "text": fatwa.question,
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": fatwa.answer, 
+            },
+            "dateCreated": new Date().toISOString() // يجب استبدالها بتاريخ الفتوى الفعلي إذا كان متاحًا
+          }
+        };
+
+        if (!schemaScript) {
+            schemaScript = document.createElement('script');
+            schemaScript.id = 'fatwa-schema-ld';
+            schemaScript.type = 'application/ld+json';
+            head.appendChild(schemaScript);
+        }
+        schemaScript.textContent = JSON.stringify(schemaMarkup);
+    } else {
+        // إزالة الترميز عند العودة للصفحة الرئيسية أو قائمة النتائج
+        if (schemaScript) {
+            schemaScript.remove();
+        }
+    }
+};
+
+
 // --- Main App Component ---
 const App = () => {
   const [fatwas, setFatwas] = useState([]);
@@ -455,8 +519,9 @@ const App = () => {
         setRelatedFatwas([]);
         return;
     }
+    // Optimization: Use first few words for related search
     const keywords = fatwa.question.split(' ').filter(word => word.length > 3);
-    const query = keywords.length > 0 ? keywords[0] : fatwa.question.split(' ')[0];
+    const query = keywords.length > 0 ? keywords.slice(0, 3).join(' ') : fatwa.question.split(' ')[0];
 
     if (!query) {
         setRelatedFatwas([]);
@@ -467,6 +532,7 @@ const App = () => {
         const response = await fetch(`${API_BASE_URL}${encodeURIComponent(query)}`);
         const data = await response.json();
         const items = (data.items || []).map(normalizeFatwa); 
+        // Filter out the current fatwa and limit results
         const filteredItems = items.filter(item => item.id !== fatwa.id).slice(0, 5);
         setRelatedFatwas(filteredItems);
     } catch (err) {
@@ -562,6 +628,11 @@ const App = () => {
     }
   }, [currentPath, fetchFatwaById, fetchFatwasByQuery]);
 
+  // --- SEO Effect ---
+  // A dedicated effect to update the SEO tags and schema when selectedFatwa changes
+  useEffect(() => {
+      updateSeoTags(selectedFatwa);
+  }, [selectedFatwa]);
 
   // --- Event Handlers ---
   const handleSearch = (query) => {
