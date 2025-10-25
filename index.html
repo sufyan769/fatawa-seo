@@ -80,7 +80,7 @@ const DEFAULT_TITLE = 'موسوعة الفتاوى';
 const DEFAULT_DESCRIPTION = 'محرك بحث متخصص في الفتاوى الشرعية مع إمكانية التنقل بين الفتاوى المترابطة.';
 
 
-// --- Icon Components (omitted for brevity, assume they are still here) ---
+// --- Icon Components ---
 
 const SearchIcon = ({ className }) => (
   <svg
@@ -422,10 +422,11 @@ const ThemeToggle = ({ theme, toggleTheme }) => {
 
 /**
  * دالة مساعدة لتحديث علامات الـ SEO في الـ <head>
- * لأن React لا تتحكم في الـ <head> بشكل مباشر
+ * تضيف: Title, Meta Description, Canonical Link, و JSON-LD Schema (QAPage + Publisher)
  */
 const updateSeoTags = (fatwa) => {
     const head = document.head;
+    const currentUrl = window.location.origin + window.location.pathname;
 
     // 1. تحديث العنوان (Title)
     document.title = fatwa 
@@ -445,7 +446,18 @@ const updateSeoTags = (fatwa) => {
     }
     metaDescription.content = description;
 
-    // 3. إضافة/إزالة JSON-LD Schema Markup
+    // 3. الرابط الكانونيكال (Canonical Link) - الأهم للتحكم في الروابط
+    let canonicalLink = head.querySelector('link[rel="canonical"]');
+    if (!canonicalLink) {
+        canonicalLink = document.createElement('link');
+        canonicalLink.rel = 'canonical';
+        head.appendChild(canonicalLink);
+    }
+    // الرابط الكانونيكال هو رابط الصفحة الحالية عند عرض فتوى منفردة، والصفحة الرئيسية إذا لم يكن هناك شيء محدد
+    canonicalLink.href = fatwa ? currentUrl : window.location.origin;
+
+
+    // 4. إضافة/إزالة JSON-LD Schema Markup (QAPage + E-A-T Publisher)
     let schemaScript = head.querySelector('#fatwa-schema-ld');
     
     if (fatwa) {
@@ -456,11 +468,19 @@ const updateSeoTags = (fatwa) => {
             "@type": "Question",
             "name": fatwa.question,
             "text": fatwa.question,
+            // (Placeholder: Replace with actual date if available)
+            "dateCreated": new Date().toISOString(), 
             "acceptedAnswer": {
               "@type": "Answer",
               "text": fatwa.answer, 
             },
-            "dateCreated": new Date().toISOString() // يجب استبدالها بتاريخ الفتوى الفعلي إذا كان متاحًا
+          },
+          // E-A-T: تعيين الناشر كـ "موسوعة الفتاوى"
+          "publisher": { 
+            "@type": "Organization",
+            "name": "موسوعة الفتاوى", 
+            "url": window.location.origin,
+            // يُفضل إضافة شعار (logo) إذا كان متاحاً
           }
         };
 
