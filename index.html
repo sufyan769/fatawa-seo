@@ -7,6 +7,7 @@
     <title>موسوعة الفتاوى</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Add Babel for in-browser JSX transformation -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;700&display=swap" rel="stylesheet">
@@ -44,12 +45,11 @@
 </head>
   <body class="bg-gray-50 dark:bg-gray-900">
     <div id="root"></div>
-    <script type="module">
+    <script type="text/babel" data-type="module">
 // --- Start of combined script ---
 
 import React, { useState, useEffect, useCallback } from 'react';
 import ReactDOM from 'react-dom/client';
-import { BrowserRouter, Routes, Route, useNavigate, useParams, Link } from 'react-router-dom';
 
 // --- Helper Functions ---
 const normalizeFatwa = (item) => {
@@ -284,7 +284,7 @@ const FatwaDetail = ({ fatwa, onIdClick, onBack, relatedFatwas, onRelatedFatwaSe
           return (
             <a
               key={index}
-              href={`#/fatwa/${fatwaId}`}
+              href={`/fatwa/${fatwaId}`}
               onClick={(e) => {
                 e.preventDefault();
                 onIdClick(fatwaId);
@@ -424,7 +424,7 @@ const App = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [listTitle, setListTitle] = useState('فتاوى مختارة');
-  const [location, setLocation] = useState(window.location.hash);
+  const [currentPath, setCurrentPath] = useState(window.location.pathname);
   const [theme, setTheme] = useState(() => {
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme) return savedTheme;
@@ -442,6 +442,12 @@ const App = () => {
 
   const toggleTheme = () => {
     setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
+  };
+
+  // Helper for navigation using History API
+  const navigate = (path) => {
+    window.history.pushState({}, '', path);
+    setCurrentPath(path);
   };
 
   const fetchRelatedFatwas = useCallback(async (fatwa) => {
@@ -503,7 +509,6 @@ const App = () => {
   const fetchFatwasByQuery = useCallback(async (query) => {
     setIsLoading(true);
     setError(null);
-    // setSelectedFatwa(null); // This is now handled by the router effect
     setRelatedFatwas([]);
     try {
         const response = await fetch(`${API_BASE_URL}${encodeURIComponent(query)}`);
@@ -520,21 +525,21 @@ const App = () => {
     }
   }, []);
 
-  // --- Robust Hash-based Routing ---
+  // --- Path-based Routing ---
 
-  // Listen for hash changes to sync state
+  // Listen for popstate (back/forward buttons)
   useEffect(() => {
-    const handleHashChange = () => {
-      setLocation(window.location.hash);
+    const handlePopState = () => {
+      setCurrentPath(window.location.pathname);
     };
-    window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  // React to location state changes to fetch data and update UI
+  // React to path changes to fetch data and update UI
   useEffect(() => {
-    const hash = location.substring(1); // remove '#'
-    const pathParts = hash.split("/").filter(p => p);
+    const path = currentPath;
+    const pathParts = path.split("/").filter(p => p);
 
     window.scrollTo(0, 0);
 
@@ -555,24 +560,24 @@ const App = () => {
       setListTitle('فتاوى مختارة');
       fetchFatwasByQuery(randomTerm);
     }
-  }, [location, fetchFatwaById, fetchFatwasByQuery]);
+  }, [currentPath, fetchFatwaById, fetchFatwasByQuery]);
 
 
   // --- Event Handlers ---
   const handleSearch = (query) => {
     if (/^\d+$/.test(query)) {
-      window.location.hash = `#/fatwa/${query}`;
+      navigate(`/fatwa/${query}`);
     } else {
-      window.location.hash = `#/search/${encodeURIComponent(query)}`;
+      navigate(`/search/${encodeURIComponent(query)}`);
     }
   };
 
   const handleFatwaSelect = (fatwa) => {
-    window.location.hash = `#/fatwa/${fatwa.id}`;
+    navigate(`/fatwa/${fatwa.id}`);
   };
   
   const handleIdClick = (id) => {
-    window.location.hash = `#/fatwa/${id}`;
+    navigate(`/fatwa/${id}`);
   };
 
   const handleBackToList = () => {
@@ -588,15 +593,13 @@ const App = () => {
         <header className="text-center mb-8">
             <div 
               className="flex justify-center items-center gap-4 text-emerald-600 dark:text-emerald-400 cursor-pointer"
-              onClick={() => window.location.hash = '#/'}
+              onClick={() => navigate('/')}
             >
                 <BookIcon className="w-12 h-12"/>
-                <h1 className="text-5xl font-bold">هل يجوز </h1>
+                <h1 className="text-5xl font-bold">موسوعة الفتاوى</h1>
             </div>
             <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">
-                فتاوى اسلامية على منهج السلف
-
-
+                محرك بحث متخصص في الفتاوى الشرعية مع إمكانية التنقل بين الفتاوى المترابطة
             </p>
         </header>
 
