@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
   <head>
@@ -151,34 +152,23 @@ const LoadingSpinner = () => (
 
 const SearchInput = ({ onSearch, isLoading }) => {
   const [query, setQuery] = useState('');
-  const [searchType, setSearchType] = useState('fuzzy');
-
-  const searchOptions = [
-      { id: 'fuzzy', label: 'بحث تقريبي', description: 'يبحث عن كلمات مشابهة أو قريبة (السلوك الافتراضي).' },
-      { id: 'and', label: 'بحث شامل (AND)', description: 'يبحث عن فتاوى تحتوي على كل الكلمات. (يعتمد على دعم الواجهة الخلفية)' },
-      { id: 'phrase', label: 'بحث بالعبارة', description: 'للبحث عن العبارة الكاملة كما هي. (يعتمد على دعم الواجهة الخلفية)' },
-      { id: 'bool', label: 'بحث منطقي (Bool)', description: 'للبحث المتقدم باستخدام AND, OR, NOT. (يعتمد على دعم الواجهة الخلفية)' },
-      { id: 'byNumber', label: 'بحث بالرقم', description: 'للوصول المباشر لفتوى معينة عبر إدخال رقمها.' }
-  ];
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (query.trim()) {
-      onSearch(query.trim(), searchType);
+      onSearch(query.trim());
     }
   };
-  
-  const selectedOption = searchOptions.find(opt => opt.id === searchType);
 
   return (
     <div className="w-full max-w-2xl mx-auto my-8">
       <form onSubmit={handleSubmit}>
         <div className="flex items-center">
           <input
-            type={searchType === 'byNumber' ? 'number' : 'text'}
+            type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder={searchType === 'byNumber' ? 'أدخل رقم الفتوى...' : 'ابحث عن فتوى...'}
+            placeholder="ابحث عن فتوى أو أدخل رقمها..."
             className="w-full px-5 py-3 text-lg text-gray-700 bg-white border border-gray-300 rounded-r-full rounded-l-none focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"
             disabled={isLoading}
           />
@@ -192,22 +182,9 @@ const SearchInput = ({ onSearch, isLoading }) => {
           </button>
         </div>
       </form>
-      <div className="mt-4 flex justify-center gap-2 flex-wrap">
-        {searchOptions.map(option => (
-          <button 
-            key={option.id}
-            onClick={() => setSearchType(option.id)}
-            className={`px-4 py-2 text-sm rounded-full transition-colors ${searchType === option.id ? 'bg-emerald-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600'}`}
-          >
-            {option.label}
-          </button>
-        ))}
-      </div>
-      {selectedOption && (
-          <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-3 h-5">
-              {selectedOption.description}
-          </p>
-      )}
+      <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-3">
+        يمكنك البحث بالكلمات أو إدخال رقم الفتوى مباشرة.
+      </p>
     </div>
   );
 };
@@ -526,7 +503,7 @@ const App = () => {
   const fetchFatwasByQuery = useCallback(async (query) => {
     setIsLoading(true);
     setError(null);
-    setSelectedFatwa(null);
+    // setSelectedFatwa(null); // This is now handled by the router effect
     setRelatedFatwas([]);
     try {
         const response = await fetch(`${API_BASE_URL}${encodeURIComponent(query)}`);
@@ -568,22 +545,22 @@ const App = () => {
       }
     } else if (pathParts[0] === 'search' && pathParts[1]) {
       const query = decodeURIComponent(pathParts[1]);
+      setSelectedFatwa(null);
       setListTitle(`نتائج البحث عن: "${query}"`);
       fetchFatwasByQuery(query);
-      setSelectedFatwa(null);
     } else {
       // Home page / initial state
       const randomTerm = RANDOM_SEARCH_TERMS[Math.floor(Math.random() * RANDOM_SEARCH_TERMS.length)];
+      setSelectedFatwa(null);
       setListTitle('فتاوى مختارة');
       fetchFatwasByQuery(randomTerm);
-      setSelectedFatwa(null);
     }
   }, [location, fetchFatwaById, fetchFatwasByQuery]);
 
 
   // --- Event Handlers ---
-  const handleSearch = (query, searchType) => {
-    if (searchType === 'byNumber') {
+  const handleSearch = (query) => {
+    if (/^\d+$/.test(query)) {
       window.location.hash = `#/fatwa/${query}`;
     } else {
       window.location.hash = `#/search/${encodeURIComponent(query)}`;
@@ -609,7 +586,10 @@ const App = () => {
             <ThemeToggle theme={theme} toggleTheme={toggleTheme} />
         </div>
         <header className="text-center mb-8">
-            <div className="flex justify-center items-center gap-4 text-emerald-600 dark:text-emerald-400">
+            <div 
+              className="flex justify-center items-center gap-4 text-emerald-600 dark:text-emerald-400 cursor-pointer"
+              onClick={() => window.location.hash = '#/'}
+            >
                 <BookIcon className="w-12 h-12"/>
                 <h1 className="text-5xl font-bold">موسوعة الفتاوى</h1>
             </div>
