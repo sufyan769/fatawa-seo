@@ -475,7 +475,7 @@ const App = () => {
         const filteredItems = items.filter(item => item.id !== fatwa.id).slice(0, 5);
         setRelatedFatwas(filteredItems);
     } catch (err) {
-        console.error("Failed to fetch related fatwas:", err);
+        console.error("هل يجوز؟ – فتاوى اسلامية على منهج السلف:", err);
         setRelatedFatwas([]);
     }
   }, []);
