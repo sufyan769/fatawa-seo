@@ -1,649 +1,340 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="title" content="هل يجوز؟ – فتاوى اسلامية على منهج السلف" />
-     <meta name="description" content="موقع هل يجوز؟ موسوعة فتاوى اسلامية سؤال وجواب على منهج السلف." />
-     <meta property="og:title" content="هل يجوز؟ – فتاوى اسلامية على منهج السلف" />
-    <meta property="og:site_name" content="هل يجوز؟" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>هل يجوز </title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Add Babel for in-browser JSX transformation -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="icon" href="/favicon.ico" />
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;700&display=swap" rel="stylesheet">
-    <script>
-      tailwind.config = {
-        darkMode: 'class',
-      }
-    </script>
-    <style>
-      body {
-        font-family: 'Noto Naskh Arabic', sans-serif;
-      }
-      .line-clamp-2 {
-        overflow: hidden;
-        display: -webkit-box;
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 2;
-      }
-      .animate-fade-in {
-        animation: fadeIn 0.5s ease-in-out;
-      }
-      @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-      }
-    </style>
-  <script type="importmap">
-{
-  "imports": {
-    "react": "https://esm.sh/react@18.2.0",
-    "react-dom/client": "https://esm.sh/react-dom@18.2.0/client"
-  }
-}
-</script>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>تفاصيل الفتوى - موسوعة البيان</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Noto+Naskh+Arabic:wght@400;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
-  <body class="bg-gray-50 dark:bg-gray-900">
-    <div id="root"></div>
-    <script type="text/babel" data-type="module">
-// --- Start of combined script ---
 
-import React, { useState, useEffect, useCallback } from 'react';
-import ReactDOM from 'react-dom/client';
+<body class="reader-body">
+  <nav class="main-nav">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo">
+        <i data-lucide="library"></i>
+        <span class="brand-mark"><span class="brand-slate">موسوعة</span> <span class="brand-accent">البيان</span></span>
+      </a>
+      <div class="nav-links">
+        <a href="index.html?tab=hadith" class="nav-link">
+          <i data-lucide="book-open-check" class="w-4 h-4"></i>
+          الحديث الشريف
+        </a>
+        <a href="index.html?tab=scholars" class="nav-link">
+          <i data-lucide="users" class="w-4 h-4"></i>
+          تراجم العلماء
+        </a>
+        <a href="history.html" class="nav-link">
+          <i data-lucide="scroll" class="w-4 h-4"></i>
+          سير الأعلام
+        </a>
+        <a href="algolia-search.html" class="nav-link active">
+          <i data-lucide="book" class="w-4 h-4"></i>
+          موسوعة الفتاوى
+        </a>
+        <a href="firebase-search.html" class="nav-link">
+          <i data-lucide="database" class="w-4 h-4"></i>
+          بحث Firebase
+        </a>
+      </div>
+    </div>
+  </nav>
 
-// --- Helper Functions ---
-const normalizeFatwa = (item) => {
-  const newItem = { ...item };
-  // 1. Unify the answer key
-  if (newItem.text && !newItem.answer) {
-    newItem.answer = newItem.text;
-    delete newItem.text;
-  }
+  <section class="reader-toolbar">
+    <div class="container-fluid">
+      <button onclick="window.location.href='algolia-search.html'" class="reader-return">
+        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        <span>العودة إلى نتائج الفتاوى</span>
+      </button>
+      <span class="reader-note">قراءة مريحة بنمط موحّد شبيه بالقارئات الإلكترونية</span>
+    </div>
+  </section>
 
-  // 2. Extract the primary ID from the source field
-  if (newItem.source) {
-    const match = newItem.source.match(/fatwa_(\d+)\.html/);
-    if (match && match[1]) {
-      newItem.id = match[1]; 
-    }
-  } else if (newItem.id) {
-    newItem.id = String(newItem.id);
-  }
-  return newItem;
-};
-
-
-// --- Constants ---
-const API_BASE_URL = 'https://g85b062bd5c6cb1-fatwaproject.adb.me-dubai-1.oraclecloudapps.com/ords/SUFEAN/fatwas/search/';
-const API_ID_LOOKUP_BASE_URL = 'https://g85b062bd5c6cb1-fatwaproject.adb.me-dubai-1.oraclecloudapps.com/ords/SUFEAN/fatwas/search_source/';
-const RANDOM_SEARCH_TERMS = ['الصلاة', 'الزكاة', 'الحج', 'الصوم', 'الطلاق', 'الزواج'];
-
-// --- Icon Components ---
-
-const SearchIcon = ({ className }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    className={className || "h-6 w-6"}
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-    strokeWidth={2}
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-    />
-  </svg>
-);
-
-const BookIcon = ({ className }) => (
-    <svg 
-        xmlns="http://www.w3.org/2000/svg" 
-        className={className || "h-6 w-6"}
-        fill="none" 
-        viewBox="0 0 24 24" 
-        stroke="currentColor" 
-        strokeWidth={2}
-    >
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v11.494m0 0a7.5 7.5 0 007.5-7.5H4.5a7.5 7.5 0 007.5 7.5z" />
-        <path strokeLinecap="round" strokeLinejoin="round" d="M14 12V4.5a2.25 2.25 0 00-2.25-2.25h-1.5A2.25 2.25 0 008 4.5v7.5m6 0v2.25a2.25 2.25 0 01-2.25-2.25h-1.5a2.25 2.25 0 01-2.25-2.25V12m6 0h-6" />
-    </svg>
-);
-
-const SunIcon = ({ className }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" className={className || "h-6 w-6"} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-    </svg>
-);
-
-const MoonIcon = ({ className }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" className={className || "h-6 w-6"} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-    </svg>
-);
-
-const CopyIcon = ({ className }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" className={className || "h-6 w-6"} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-    </svg>
-);
-
-const ShareIcon = ({ className }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" className={className || "h-6 w-6"} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12s-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6.002l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.368a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
-    </svg>
-);
-
-const CheckIcon = ({ className }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" className={className || "h-6 w-6"} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-    </svg>
-);
-
-
-// --- UI Components ---
-
-const LoadingSpinner = () => (
-  <div className="flex justify-center items-center p-8">
-    <div className="w-12 h-12 border-4 border-t-4 border-gray-200 border-t-emerald-600 rounded-full animate-spin"></div>
+  <div id="loadingSpinner" class="reader-loading">
+    <div class="spinner"></div>
   </div>
-);
 
-const SearchInput = ({ onSearch, isLoading }) => {
-  const [query, setQuery] = useState('');
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (query.trim()) {
-      onSearch(query.trim());
-    }
-  };
-
-  return (
-    <div className="w-full max-w-2xl mx-auto my-8">
-      <form onSubmit={handleSubmit}>
-        <div className="flex items-center">
-          <input
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="ابحث عن فتوى أو أدخل رقمها..."
-            className="w-full px-5 py-3 text-lg text-gray-700 bg-white border border-gray-300 rounded-r-full rounded-l-none focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"
-            disabled={isLoading}
-          />
-          <button
-            type="submit"
-            className="flex items-center justify-center w-14 h-full px-4 py-3 text-white bg-emerald-600 rounded-l-full rounded-r-none hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:bg-emerald-400"
-            style={{height: '50px'}}
-            disabled={isLoading}
-          >
-            <SearchIcon className="w-6 h-6" />
-          </button>
-        </div>
-      </form>
-      <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-3">
-        يمكنك البحث بالكلمات أو إدخال رقم الفتوى مباشرة.
-      </p>
+  <div id="errorState" class="hidden state-card reader-message">
+    <i data-lucide="alert-octagon"></i>
+    <div>
+      <h3>تعذر تحميل الفتوى</h3>
+      <p id="errorMessage">يرجى التأكد من الرابط والمحاولة مرة أخرى.</p>
     </div>
-  );
-};
+  </div>
 
-const FatwaListItem = ({ fatwa, onSelect }) => {
-  return (
-    <div
-      onClick={() => onSelect(fatwa)}
-      className="py-5 cursor-pointer group"
-    >
-      <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors duration-200 line-clamp-2">
-        {fatwa.question}
-      </h3>
-      <span className="text-md text-emerald-600 dark:text-emerald-400 mt-1 inline-block">
-        ... أكمل القراءة
-      </span>
+  <div id="viewContainer" class="reader-container hidden">
+    <header class="article-header">
+      <h1 id="fatwaQuestion" class="article-title"></h1>
+      <div id="metaBar" class="meta-bar"></div>
+    </header>
+
+    <div class="reader-controls">
+      <button id="copyBtn" class="btn btn-secondary">
+        <i data-lucide="copy" class="w-4 h-4"></i>
+        <span>نسخ الجواب</span>
+      </button>
+      <button id="shareBtn" class="btn btn-primary">
+        <i data-lucide="share-2" class="w-4 h-4"></i>
+        <span>مشاركة</span>
+      </button>
     </div>
-  );
-};
 
-const FatwaList = ({ fatwas, onFatwaSelect, title }) => {
-  if (fatwas.length === 0) {
-    return (
-        <div className="text-center p-8">
-            <p className="text-gray-600 dark:text-gray-400">لم يتم العثور على نتائج.</p>
-        </div>
-    );
-  }
+    <article id="fatwaAnswer" class="article-text"></article>
+  </div>
 
-  return (
-    <div className="w-full max-w-4xl mx-auto">
-      <h2 className="text-3xl font-bold text-center mb-6 text-gray-800 dark:text-gray-200">{title}</h2>
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md">
-        <div className="flex flex-col divide-y divide-gray-200 dark:divide-gray-700 px-6">
-            {fatwas.map((fatwa) => (
-              <FatwaListItem key={fatwa.id} fatwa={fatwa} onSelect={onFatwaSelect} />
-            ))}
-        </div>
-      </div>
-    </div>
-  );
-};
+  <footer class="site-footer">
+    <p>&copy; 2025 الموسوعة الشاملة. جميع الحقوق محفوظة.</p>
+  </footer>
 
-
-const FatwaDetail = ({ fatwa, onIdClick, onBack, relatedFatwas, onRelatedFatwaSelect }) => {
-  const [fontLevel, setFontLevel] = useState(() => {
-    const savedLevel = localStorage.getItem('fatwaFontLevel');
-    return savedLevel ? parseInt(savedLevel, 10) : 1; // 0: small, 1: medium, 2: large
-  });
-  const [copyStatus, setCopyStatus] = useState('idle');
-
-  const fontClasses = ['text-xl', 'text-2xl', 'text-3xl'];
-  const lineHeights = ['leading-relaxed', 'leading-loose', 'leading-loose'];
-
-  const handleFontSizeChange = (direction) => {
-    const newLevel = direction === 'increase' 
-        ? Math.min(fontLevel + 1, fontClasses.length - 1)
-        : Math.max(fontLevel - 1, 0);
-    setFontLevel(newLevel);
-    localStorage.setItem('fatwaFontLevel', newLevel.toString());
-  };
-
-  const handleCopy = () => {
-    const textToCopy = `السؤال: ${fatwa.question}\n\nالجواب: ${fatwa.answer}\n\nالمصدر: ${fatwa.source}`;
-    navigator.clipboard.writeText(textToCopy).then(() => {
-        setCopyStatus('copied');
-        setTimeout(() => setCopyStatus('idle'), 2000);
-    }).catch(err => {
-        console.error('Failed to copy text: ', err);
-    });
-  };
-
-  const handleShare = () => {
-    if (navigator.share) {
-        navigator.share({
-            title: `فتوى: ${fatwa.question}`,
-            text: `السؤال: ${fatwa.question}\n\nالجواب: ${fatwa.answer}`,
-            url: window.location.href,
-        }).catch(error => console.log('Error sharing', error));
-    } else {
-        handleCopy();
-    }
-  };
-  
-  const parseAndLinkAnswer = (text) => {
-    if (typeof text !== 'string' || !text.trim()) {
-        return <span className="text-gray-500 italic">لا يتوفر جواب لهذه الفتوى حالياً.</span>;
-    }
-
-    const regex = /(\[\d+\]|\b\d{3,}\b)/g;
-    const parts = text.split(regex);
-
-    return parts.map((part, index) => {
-      if (index % 2 === 1) {
-        const fatwaId = part.replace(/\D/g, ''); 
-        if (fatwaId) {
-          return (
-            <a
-              key={index}
-              href={`/fatwa/${fatwaId}`}
-              onClick={(e) => {
-                e.preventDefault();
-                onIdClick(fatwaId);
-              }}
-              className="text-emerald-600 dark:text-emerald-400 font-bold hover:underline mx-1"
-            >
-              {part}
-            </a>
-          );
-        }
-      }
-      return part.split('\n').map((line, i) => (
-        <React.Fragment key={`${index}-${i}`}>
-            {line}
-            {i < part.split('\n').length - 1 && <br/>}
-        </React.Fragment>
-      ));
-    });
-  };
-
-  return (
-    <div className="w-full max-w-4xl mx-auto flex flex-col gap-8">
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 animate-fade-in">
-          <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
-            <button onClick={onBack} className="px-4 py-2 bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
-                &rarr; عودة
-            </button>
-            <div className="flex items-center gap-2">
-                <div className="flex items-center border border-gray-300 dark:border-gray-600 rounded-md">
-                    <button onClick={() => handleFontSizeChange('decrease')} className="px-3 py-1 text-lg font-bold" aria-label="Decrease font size" disabled={fontLevel === 0}>-</button>
-                    <span className="px-2 text-sm text-gray-600 dark:text-gray-400">حجم الخط</span>
-                    <button onClick={() => handleFontSizeChange('increase')} className="px-3 py-1 text-lg font-bold" aria-label="Increase font size" disabled={fontLevel === fontClasses.length - 1}>+</button>
-                </div>
-                 <button onClick={handleCopy} className="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" aria-label="Copy fatwa">
-                    {copyStatus === 'copied' ? <CheckIcon className="w-5 h-5 text-green-500" /> : <CopyIcon className="w-5 h-5" />}
-                </button>
-                {navigator.share && (
-                    <button onClick={handleShare} className="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" aria-label="Share fatwa">
-                        <ShareIcon className="w-5 h-5" />
-                    </button>
-                )}
-            </div>
-          </div>
-        <div className="border-b-2 border-emerald-500 pb-4 mb-4">
-          <p className="text-md text-emerald-600 dark:text-emerald-400 font-bold">معرف الفتوى: {fatwa.id}</p>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-2">{fatwa.question}</h1>
-        </div>
-        <div className="max-w-none text-gray-700 dark:text-gray-300">
-          <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-2">الجواب:</h2>
-          <div className={`whitespace-pre-wrap ${fontClasses[fontLevel]} ${lineHeights[fontLevel]}`}>
-            {parseAndLinkAnswer(fatwa.answer)}
-          </div>
-        </div>
-        <div className="mt-8 pt-4 border-t border-gray-200 dark:border-gray-700">
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            <span className="font-semibold">المصدر:</span> {fatwa.source}
-          </p>
-        </div>
-      </div>
-      
-      {relatedFatwas.length > 0 && (
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 animate-fade-in">
-          <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4">فتاوى ذات صلة</h3>
-          <ul className="flex flex-col divide-y divide-gray-200 dark:divide-gray-700">
-            {relatedFatwas.map(relatedFatwa => (
-              <li 
-                key={relatedFatwa.id}
-                onClick={() => onRelatedFatwaSelect(relatedFatwa)}
-                className="py-3 cursor-pointer group"
-              >
-                <p className="text-lg text-gray-700 dark:text-gray-300 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors duration-200 line-clamp-2">
-                  {relatedFatwa.question}
-                </p>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-    </div>
-  );
-};
-
-
-const FeaturedQuestions = ({ fatwas, onQuestionClick }) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isFading, setIsFading] = useState(false);
-
-  useEffect(() => {
-    if (fatwas.length < 2) return;
-
-    const interval = setInterval(() => {
-      setIsFading(true);
-      setTimeout(() => {
-        setCurrentIndex((prevIndex) => (prevIndex + 1) % fatwas.length);
-        setIsFading(false);
-      }, 500); 
-    }, 5000); 
-
-    return () => clearInterval(interval);
-  }, [fatwas]);
-
-  if (fatwas.length === 0) {
-    return null;
-  }
-  
-  const currentFatwa = fatwas[currentIndex];
-
-  return (
-    <div className="w-full max-w-4xl mx-auto my-6 p-6 bg-emerald-50 dark:bg-gray-800 rounded-lg shadow-sm text-center cursor-pointer hover:bg-emerald-100 dark:hover:bg-gray-700 transition-colors" onClick={() => onQuestionClick(currentFatwa)}>
-      <p className="text-gray-600 dark:text-gray-400 mb-2 font-semibold">سؤال مميز</p>
-      <h3 
-        className={`text-xl font-bold text-emerald-800 dark:text-emerald-300 transition-opacity duration-500 h-14 line-clamp-2 ${isFading ? 'opacity-0' : 'opacity-100'}`}
-      >
-        {currentFatwa?.question}
-      </h3>
-    </div>
-  );
-};
-
-const ThemeToggle = ({ theme, toggleTheme }) => {
-  return (
-    <button
-      onClick={toggleTheme}
-      className="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 focus:ring-offset-gray-50 dark:focus:ring-offset-gray-900"
-      aria-label="Toggle theme"
-    >
-      {theme === 'light' ? <MoonIcon className="w-6 h-6" /> : <SunIcon className="w-6 h-6" />}
+  <div class="fab-container reader-fabs print:hidden">
+    <button id="increaseFont" class="fab primary" title="تكبير النص">
+      <i data-lucide="zoom-in" class="w-5 h-5"></i>
     </button>
-  );
-};
+    <button id="decreaseFont" class="fab" title="تصغير النص">
+      <i data-lucide="zoom-out" class="w-5 h-5"></i>
+    </button>
+    <button id="backToResults" class="fab" title="العودة لنتائج البحث">
+      <i data-lucide="arrow-right" class="w-5 h-5"></i>
+    </button>
+  </div>
 
-// --- Main App Component ---
-const App = () => {
-  const [fatwas, setFatwas] = useState([]);
-  const [selectedFatwa, setSelectedFatwa] = useState(null);
-  const [relatedFatwas, setRelatedFatwas] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [listTitle, setListTitle] = useState('فتاوى مختارة');
-  const [currentPath, setCurrentPath] = useState(window.location.pathname);
-  const [theme, setTheme] = useState(() => {
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme) return savedTheme;
-    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-  });
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-  useEffect(() => {
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-    localStorage.setItem('theme', theme);
-  }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
-  };
-
-  // Helper for navigation using History API
-  const navigate = (path) => {
-    window.history.pushState({}, '', path);
-    setCurrentPath(path);
-  };
-
-  const fetchRelatedFatwas = useCallback(async (fatwa) => {
-    if (!fatwa.question || fatwa.question.trim().length === 0) {
-        setRelatedFatwas([]);
-        return;
-    }
-    const keywords = fatwa.question.split(' ').filter(word => word.length > 3);
-    const query = keywords.length > 0 ? keywords[0] : fatwa.question.split(' ')[0];
-
-    if (!query) {
-        setRelatedFatwas([]);
-        return;
-    }
-    
-    try {
-        const response = await fetch(`${API_BASE_URL}${encodeURIComponent(query)}`);
-        const data = await response.json();
-        const items = (data.items || []).map(normalizeFatwa); 
-        const filteredItems = items.filter(item => item.id !== fatwa.id).slice(0, 5);
-        setRelatedFatwas(filteredItems);
-    } catch (err) {
-        console.error("هل يجوز؟ – فتاوى اسلامية على منهج السلف:", err);
-        setRelatedFatwas([]);
-    }
-  }, []);
-
-  const fetchFatwaById = useCallback(async (id) => {
-    setIsLoading(true);
-    setError(null);
-    setRelatedFatwas([]);
-    
-    try {
-        const directLookupUrl = `${API_ID_LOOKUP_BASE_URL}${id}`;
-        const response = await fetch(directLookupUrl);
-        if (!response.ok) {
-            throw new Error(`لم يتم العثور على فتوى بالمعرف المحدد (${id}).`);
-        }
-
-        const data = await response.json();
-        const rawItems = data.items || [];
-        
-        if (rawItems.length > 0) {
-            const foundFatwa = normalizeFatwa(rawItems[0]); 
-            setSelectedFatwa(foundFatwa);
-            await fetchRelatedFatwas(foundFatwa);
-        } else {
-             throw new Error(`لم يتم العثور على فتوى بالمعرف المحدد (${id}).`);
-        }
-
-    } catch (err) {
-        setError(err.message);
-        setSelectedFatwa(null);
-    } finally {
-        setIsLoading(false);
-    }
-  }, [fetchRelatedFatwas]);
-
-  const fetchFatwasByQuery = useCallback(async (query) => {
-    setIsLoading(true);
-    setError(null);
-    setRelatedFatwas([]);
-    try {
-        const response = await fetch(`${API_BASE_URL}${encodeURIComponent(query)}`);
-        if (!response.ok) throw new Error('فشل في جلب البيانات');
-        const data = await response.json();
-        const combinedItems = (data.items || []).map(normalizeFatwa);
-        const uniqueItems = Array.from(new Map(combinedItems.map(item => [item.id, item])).values());
-        setFatwas(uniqueItems);
-    } catch (err) {
-        setError(err.message);
-        setFatwas([]);
-    } finally {
-        setIsLoading(false);
-    }
-  }, []);
-
-  // --- Path-based Routing ---
-
-  // Listen for popstate (back/forward buttons)
-  useEffect(() => {
-    const handlePopState = () => {
-      setCurrentPath(window.location.pathname);
+    const firebaseConfig = {
+      apiKey: "AIzaSyC9kI6aUcgHokt7e20TOL1IQpA9M7r15pc",
+      authDomain: "alfatawa-96fdd.firebaseapp.com",
+      projectId: "alfatawa-96fdd",
+      storageBucket: "alfatawa-96fdd.firebasestorage.app",
+      messagingSenderId: "796227786570",
+      appId: "1:796227786570:web:bfaed60987b9b81cc853b3",
+      measurementId: "G-EXLF43763E"
     };
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, []);
 
-  // React to path changes to fetch data and update UI
-  useEffect(() => {
-    const path = currentPath;
-    const pathParts = path.split("/").filter(p => p);
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-    window.scrollTo(0, 0);
+    const PLACEHOLDER_DOMAIN = 'https://your-site.com';
+    const FATWA_PAGE = 'fatwa.html';
 
-    if (pathParts[0] === 'fatwa' && pathParts[1]) {
-      const id = pathParts[1].replace(/\D/g, "");
-      if (id) {
-          fetchFatwaById(id);
+    const stripPlaceholderDomain = (value = '') => value ? value.split(PLACEHOLDER_DOMAIN).join('') : '';
+    const hasHTMLMarkup = (value = '') => /<\/?[a-z][\s\S]*>/i.test(value);
+
+    const buildFatwaDetailUrl = (id) => id ? `${FATWA_PAGE}?id=${encodeURIComponent(id)}` : '#';
+
+    const rewriteFatwaHref = (href = '') => {
+      if (!href) return href;
+      const cleaned = stripPlaceholderDomain(href);
+      const match = cleaned.match(/fatwa_(\d+)\.html/i);
+      if (match && match[1]) {
+        return buildFatwaDetailUrl(match[1]);
       }
-    } else if (pathParts[0] === 'search' && pathParts[1]) {
-      const query = decodeURIComponent(pathParts[1]);
-      setSelectedFatwa(null);
-      setListTitle(`نتائج البحث عن: "${query}"`);
-      fetchFatwasByQuery(query);
-    } else {
-      // Home page / initial state
-      const randomTerm = RANDOM_SEARCH_TERMS[Math.floor(Math.random() * RANDOM_SEARCH_TERMS.length)];
-      setSelectedFatwa(null);
-      setListTitle('فتاوى مختارة');
-      fetchFatwasByQuery(randomTerm);
+      return href;
+    };
+
+    const convertFatwaLinks = (html = '') => {
+      if (!html) return html;
+      return html.replace(/href="([^"]*fatwa_pages\/[^"]*)"/gi, (fullMatch, href) => {
+        return `href="${rewriteFatwaHref(href)}"`;
+      });
+    };
+
+    const renderRichText = (value, { wrapParagraphs = true, fallback = '' } = {}) => {
+      const cleaned = stripPlaceholderDomain(value || '').trim();
+      if (!cleaned) return fallback;
+      if (hasHTMLMarkup(cleaned)) return convertFatwaLinks(cleaned);
+      if (!wrapParagraphs) return convertFatwaLinks(cleaned.replace(/\n/g, '<br>'));
+      const parts = cleaned.split(/\n+/).map(line => line.trim()).filter(Boolean);
+      if (!parts.length) return fallback;
+      return convertFatwaLinks(parts.map(line => `<p>${line}</p>`).join(''));
+    };
+
+    const viewContainer = document.getElementById('viewContainer');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    const errorState = document.getElementById('errorState');
+    const errorMessage = document.getElementById('errorMessage');
+    const fatwaQuestion = document.getElementById('fatwaQuestion');
+    const fatwaAnswer = document.getElementById('fatwaAnswer');
+    const metaBar = document.getElementById('metaBar');
+    const copyBtn = document.getElementById('copyBtn');
+    const shareBtn = document.getElementById('shareBtn');
+    const increaseFontBtn = document.getElementById('increaseFont');
+    const decreaseFontBtn = document.getElementById('decreaseFont');
+    const backToResultsBtn = document.getElementById('backToResults');
+
+    const params = new URLSearchParams(window.location.search);
+    const requestedId = params.get('id');
+    const searchTerm = params.get('q') || '';
+    let currentFontSize = 24;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      if (!requestedId) {
+        showError('لم يتم تمرير رقم الفتوى.');
+        return;
+      }
+      loadFatwa(requestedId);
+    });
+
+    increaseFontBtn.addEventListener('click', () => {
+      if (currentFontSize < 40) {
+        currentFontSize += 2;
+        updateFontSize();
+      }
+    });
+
+    decreaseFontBtn.addEventListener('click', () => {
+      if (currentFontSize > 18) {
+        currentFontSize -= 2;
+        updateFontSize();
+      }
+    });
+
+    backToResultsBtn.addEventListener('click', () => {
+      if (document.referrer && document.referrer.includes('algolia-search')) {
+        history.back();
+      } else {
+        window.location.href = 'index.html?tab=fatawa';
+      }
+    });
+
+    function updateFontSize() {
+      fatwaAnswer.style.fontSize = `${currentFontSize}px`;
+      fatwaAnswer.style.lineHeight = 1.65;
     }
-  }, [currentPath, fetchFatwaById, fetchFatwasByQuery]);
 
-
-  // --- Event Handlers ---
-  const handleSearch = (query) => {
-    if (/^\d+$/.test(query)) {
-      navigate(`/fatwa/${query}`);
-    } else {
-      navigate(`/search/${encodeURIComponent(query)}`);
+    async function loadFatwa(id) {
+      showLoading();
+      try {
+        const ref = doc(db, 'alfatawa', String(id));
+        const snap = await getDoc(ref);
+        if (!snap.exists()) {
+          showError('لم يتم العثور على الفتوى المطلوبة.');
+          return;
+        }
+        const data = snap.data();
+        renderFatwa({ ...data, id });
+      } catch (err) {
+        console.error(err);
+        showError('حدث خطأ أثناء الاتصال.');
+      }
     }
-  };
 
-  const handleFatwaSelect = (fatwa) => {
-    navigate(`/fatwa/${fatwa.id}`);
-  };
-  
-  const handleIdClick = (id) => {
-    navigate(`/fatwa/${id}`);
-  };
+    function renderFatwa(data) {
+      const questionHTML = renderRichText(data.question, { wrapParagraphs: false, fallback: 'سؤال بدون عنوان' });
+      fatwaQuestion.innerHTML = questionHTML;
+      fatwaAnswer.innerHTML = renderRichText(data.answer, { wrapParagraphs: true, fallback: '<p>لا يوجد نص للجواب.</p>' });
+      metaBar.innerHTML = buildMeta(data);
+      viewContainer.classList.remove('hidden');
+      loadingSpinner.classList.add('hidden');
+      errorState.classList.add('hidden');
 
-  const handleBackToList = () => {
-    window.history.back();
-  };
+      updateFontSize();
+      lucide.createIcons();
 
-  return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 transition-colors duration-300">
-      <main className="container mx-auto px-4 py-8 relative">
-        <div className="absolute top-4 left-4 z-10">
-            <ThemeToggle theme={theme} toggleTheme={toggleTheme} />
-        </div>
-        <header className="text-center mb-8">
-            <div 
-              className="flex justify-center items-center gap-4 text-emerald-600 dark:text-emerald-400 cursor-pointer"
-              onClick={() => navigate('/')}
-            >
-                <BookIcon className="w-12 h-12"/>
-                <h1 className="text-5xl font-bold"> هل يجوز </h1>
-            </div>
-            <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">
-                فتاوى اسلامية سؤال و جواب على منهج السلف   
-            </p>
-        </header>
+      copyBtn.onclick = () => {
+        const plainAnswer = fatwaAnswer.innerText;
+        const text = `السؤال: ${fatwaQuestion.innerText}\n\nالجواب: ${plainAnswer}`;
+        navigator.clipboard.writeText(text).then(() => {
+          copyBtn.textContent = 'تم النسخ';
+          setTimeout(() => {
+            copyBtn.innerHTML = '<i data-lucide="copy" class="w-4 h-4"></i><span>نسخ الجواب</span>';
+            lucide.createIcons();
+          }, 1500);
+        });
+      };
 
-        {!selectedFatwa && <FeaturedQuestions fatwas={fatwas} onQuestionClick={handleFatwaSelect} />}
-        
-        <SearchInput onSearch={handleSearch} isLoading={isLoading} />
-        
-        {error && <div className="text-center text-red-500 bg-red-100 dark:bg-red-900 dark:text-red-300 p-4 rounded-md my-4">{error}</div>}
-        
-        <div className="mt-10">
-            {isLoading ? (
-                <LoadingSpinner />
-            ) : selectedFatwa ? (
-                <FatwaDetail 
-                  fatwa={selectedFatwa} 
-                  onIdClick={handleIdClick} 
-                  onBack={handleBackToList}
-                  relatedFatwas={relatedFatwas}
-                  onRelatedFatwaSelect={handleFatwaSelect}
-                />
-            ) : (
-                <FatwaList fatwas={fatwas} onFatwaSelect={handleFatwaSelect} title={listTitle} />
-            )}
-        </div>
-      </main>
-    </div>
-  );
-};
+      shareBtn.onclick = () => {
+        const url = buildFatwaDetailUrl(data.id || '');
+        navigator.clipboard.writeText(new URL(url, window.location.href).toString()).then(() => {
+          shareBtn.textContent = 'تم نسخ الرابط';
+          setTimeout(() => {
+            shareBtn.innerHTML = '<i data-lucide="share-2" class="w-4 h-4"></i><span>مشاركة</span>';
+            lucide.createIcons();
+          }, 1500);
+        });
+      };
 
-// --- Render App ---
-const rootElement = document.getElementById('root');
-const root = ReactDOM.createRoot(rootElement);
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+      if (searchTerm) {
+        setTimeout(() => {
+          highlightTerms(fatwaQuestion, searchTerm);
+          highlightTerms(fatwaAnswer, searchTerm);
+        }, 100);
+      }
+    }
 
-// --- End of combined script ---
-    </script>
-  </body>
+    function highlightTerms(element, term) {
+      if (!term || !element) return;
+
+      const terms = term.split(/\s+/).filter(t => t.length > 2);
+      if (terms.length === 0) return;
+
+      // Create a regex that matches any of the terms, case insensitive
+      const regex = new RegExp(`(${terms.map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})`, 'gi');
+
+      const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, null, false);
+      const nodes = [];
+      let node;
+      while (node = walker.nextNode()) {
+        nodes.push(node);
+      }
+
+      nodes.forEach(textNode => {
+        const text = textNode.nodeValue;
+        if (regex.test(text)) {
+          const fragment = document.createDocumentFragment();
+          let lastIndex = 0;
+          text.replace(regex, (match, p1, offset) => {
+            // Append text before match
+            fragment.appendChild(document.createTextNode(text.slice(lastIndex, offset)));
+
+            // Append highlighted match
+            const span = document.createElement('span');
+            span.style.color = '#dc2626'; // Red
+            span.style.fontWeight = 'bold';
+            span.textContent = match;
+            fragment.appendChild(span);
+
+            lastIndex = offset + match.length;
+            return match;
+          });
+
+          // Append remaining text
+          fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+
+          textNode.parentNode.replaceChild(fragment, textNode);
+        }
+      });
+    }
+
+    function buildMeta(data) {
+      const parts = [];
+      if (data.id) parts.push(`<span class="reader-meta-pill">فتوى رقم ${data.id}</span>`);
+      if (data.source) parts.push(`<span class="reader-meta-pill" style="background:rgba(16,185,129,0.12);color:#047857;">${data.source}</span>`);
+      return parts.join('');
+    }
+
+    function showError(message) {
+      loadingSpinner.classList.add('hidden');
+      viewContainer.classList.add('hidden');
+      errorState.classList.remove('hidden');
+      errorMessage.textContent = message;
+      lucide.createIcons();
+    }
+
+    function showLoading() {
+      loadingSpinner.classList.remove('hidden');
+      errorState.classList.add('hidden');
+      viewContainer.classList.add('hidden');
+    }
+  </script>
+</body>
+
 </html>
