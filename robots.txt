@@ -1,3 +1,4 @@
 User-agent: *
 Allow: /
-Sitemap: https://fatawa.netlify.app/sitemap_index.xml
+
+Sitemap: https://sufyan769.github.io/-bayan/sitemap.xml
