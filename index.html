@@ -88,6 +88,9 @@
 
   <main class="simple-shell">
     <section class="search-stack search-stack--compact">
+      <div class="stack-header mb-2 text-center">
+        <h1 style="font-size: 1.8rem; font-weight: bold; color: var(--primary-color); margin: 0 auto; font-family: 'Amiri', serif;">الموسوعة الشاملة - محرك بحث إسلامي موحد</h1>
+      </div>
       <div class="search-tabs">
         <button class="search-tab active" data-target="all">الكل</button>
         <button class="search-tab" data-target="hadith">الحديث</button>
@@ -205,7 +208,7 @@
       }
     };
 
-    const PLACEHOLDER_DOMAIN = 'https://your-site.com';
+    const PLACEHOLDER_DOMAIN = 'https://fatawa-seo.vercel.app';
     const FATWA_PAGE = 'fatwa.html';
 
     const stripPlaceholderDomain = (value = '') => value ? value.split(PLACEHOLDER_DOMAIN).join('') : '';
@@ -665,7 +668,7 @@
       if (!url) return '';
       try {
         const parsed = new URL(url, window.location.origin);
-        if (parsed.hostname.includes('your-site.com')) {
+        if (parsed.hostname.includes('fatawa-seo.vercel.app')) {
           return parsed.pathname + parsed.search + parsed.hash;
         }
         return url;

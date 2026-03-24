@@ -23,29 +23,32 @@
                 <span class="brand-mark"><span class="brand-slate">موسوعة</span> <span
                         class="brand-accent">البيان</span></span>
             </a>
-            <div class="nav-links">
-                <a href="index.html?tab=hadith" class="nav-link active">
-                    <i data-lucide="book-open-check" class="w-4 h-4"></i>
-                    الحديث الشريف
-                </a>
-
-                <a href="index.html?tab=scholars" class="nav-link">
-                    <i data-lucide="users" class="w-4 h-4"></i>
-                    تراجم العلماء
-                </a>
-                <a href="history.html" class="nav-link">
-                    <i data-lucide="scroll" class="w-4 h-4"></i>
-                    سير الأعلام
-                </a>
-                <a href="algolia-search.html" class="nav-link">
-                    <i data-lucide="book" class="w-4 h-4"></i>
-                    موسوعة الفتاوى
-                </a>
-                <a href="firebase-search.html" class="nav-link">
-                    <i data-lucide="database" class="w-4 h-4"></i>
-                    بحث Firebase
-                </a>
-            </div>
+                  <div class="nav-links">
+        <a href="index.html?tab=hadith" class="nav-link active">
+          <i data-lucide="book-open-check" class="w-4 h-4"></i>
+          الحديث الشريف
+        </a>
+        <a href="index.html?tab=scholars" class="nav-link">
+          <i data-lucide="users" class="w-4 h-4"></i>
+          تراجم العلماء
+        </a>
+        <a href="index.html?tab=history" class="nav-link">
+          <i data-lucide="scroll" class="w-4 h-4"></i>
+          سير الأعلام
+        </a>
+        <a href="index.html?tab=jarh" class="nav-link">
+          <i data-lucide="scale" class="w-4 h-4"></i>
+          الجرح والتعديل
+        </a>
+        <a href="index.html?tab=fatawa" class="nav-link">
+          <i data-lucide="book" class="w-4 h-4"></i>
+          موسوعة الفتاوى
+        </a>
+        <a href="index.html?tab=firebase" class="nav-link">
+          <i data-lucide="database" class="w-4 h-4"></i>
+          بحث Firebase
+        </a>
+      </div>
         </div>
     </nav>
 
@@ -68,7 +71,7 @@
 
     <div id="viewContainer" class="reader-container hidden">
         <!-- 1. Hadith Text (Top) -->
-        <div id="viewText" class="article-text font-bold mb-8"></div>
+        <h1 id="viewText" class="article-text font-bold mb-8" style="font-size: 1.6rem; color: #2c3e50; line-height: 1.8;"></h1>
 
         <!-- Action Buttons -->
         <div class="flex flex-wrap gap-3 mb-8 justify-center border-t border-b border-gray-100 py-4" id="hadithActionButtons">
@@ -146,6 +149,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getFirestore, doc, getDoc, updateDoc, collection, query, where, getDocs, serverTimestamp, limit } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
         import algoliasearch from 'https://cdn.jsdelivr.net/npm/algoliasearch@4.22.1/dist/algoliasearch-lite.esm.browser.js';
+        import { updateSEO } from './seo_optimizer.js';
 
         const CONFIG = {
             firebase: {
@@ -161,7 +165,11 @@
         };
 
         const params = new URLSearchParams(window.location.search);
-        const docId = params.get("id");
+        let docId = params.get("id");
+        if (!docId) {
+            const match = window.location.pathname.match(/\/hadith\/(\d+)/i);
+            if (match && match[1]) docId = match[1];
+        }
         const searchTerm = params.get("q");
 
         const app = initializeApp(CONFIG.firebase, 'hadithApp');
@@ -353,6 +361,10 @@
                     takhrijSection.classList.add('hidden');
                 }
             }
+
+            const rawTextSnippet = data.text ? data.text.substring(0, 150) : 'تفاصيل الحديث';
+            let sourceMeta = Array.isArray(data.source) ? data.source.join(', ') : data.source;
+            updateSEO(`حديث ${sourceMeta || ''}`, rawTextSnippet, window.location.href, 'Article');
 
             renderCategories(data.categories);
 
