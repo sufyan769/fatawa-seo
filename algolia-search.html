@@ -206,7 +206,7 @@
         <i data-lucide="library"></i>
         <span class="brand-mark"><span class="brand-slate">موسوعة</span> <span class="brand-accent">البيان</span></span>
       </a>
-            <div class="nav-links">
+      <div class="nav-links">
         <a href="index.html?tab=hadith" class="nav-link">
           <i data-lucide="book-open-check" class="w-4 h-4"></i>
           الحديث الشريف
@@ -215,19 +215,15 @@
           <i data-lucide="users" class="w-4 h-4"></i>
           تراجم العلماء
         </a>
-        <a href="index.html?tab=history" class="nav-link">
+        <a href="history.html" class="nav-link">
           <i data-lucide="scroll" class="w-4 h-4"></i>
-          سير الأعلام
+          البداية والنهاية
         </a>
-        <a href="index.html?tab=jarh" class="nav-link">
-          <i data-lucide="scale" class="w-4 h-4"></i>
-          الجرح والتعديل
-        </a>
-        <a href="index.html?tab=fatawa" class="nav-link active">
+        <a href="algolia-search.html" class="nav-link active">
           <i data-lucide="book" class="w-4 h-4"></i>
           موسوعة الفتاوى
         </a>
-        <a href="index.html?tab=firebase" class="nav-link">
+        <a href="firebase-search.html" class="nav-link">
           <i data-lucide="database" class="w-4 h-4"></i>
           بحث Firebase
         </a>
@@ -248,7 +244,7 @@
         <button type="submit" class="search-btn">
           <i data-lucide="search" class="w-6 h-6"></i>
         </button>
-        <input id="searchInput" type="text" class="search-input" placeholder="ابحث في موسوعة البيان..." autocomplete="off">
+        <input id="searchInput" type="text" class="search-input" placeholder="اكتب سؤالك الشرعي..." autocomplete="off">
       </form>
     </section>
 
@@ -269,7 +265,7 @@
   </main>
 
   <footer class="site-footer">
-    <p>&copy; 2025 موسوعة البيان. جميع الحقوق محفوظة.</p>
+    <p>&copy; 2025 الموسوعة الشاملة. جميع الحقوق محفوظة.</p>
   </footer>
 
   <script type="module">
@@ -290,16 +286,16 @@
 
     let currentHits = [];
 
-    const PLACEHOLDER_DOMAIN = 'https://fatawa-seo-eanp.vercel.app';
-    const FATWA_PAGE = '/fatwa/';
+    const PLACEHOLDER_DOMAIN = 'https://your-site.com';
+    const FATWA_PAGE = 'fatwa.html';
 
     const stripPlaceholderDomain = (value = '') => value ? value.split(PLACEHOLDER_DOMAIN).join('') : '';
     const hasHTMLMarkup = (value = '') => /<\/?[a-z][\s\S]*>/i.test(value);
 
     const buildFatwaDetailUrl = (id, query = '') => {
-      let url = id ? `${FATWA_PAGE}${encodeURIComponent(id)}` : '#';
+      let url = id ? `${FATWA_PAGE}?id=${encodeURIComponent(id)}` : '#';
       if (query && id) {
-        url += `?q=${encodeURIComponent(query)}`;
+        url += `&q=${encodeURIComponent(query)}`;
       }
       return url;
     };

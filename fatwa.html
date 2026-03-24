@@ -21,7 +21,7 @@
         <i data-lucide="library"></i>
         <span class="brand-mark"><span class="brand-slate">موسوعة</span> <span class="brand-accent">البيان</span></span>
       </a>
-            <div class="nav-links">
+      <div class="nav-links">
         <a href="index.html?tab=hadith" class="nav-link">
           <i data-lucide="book-open-check" class="w-4 h-4"></i>
           الحديث الشريف
@@ -30,19 +30,15 @@
           <i data-lucide="users" class="w-4 h-4"></i>
           تراجم العلماء
         </a>
-        <a href="index.html?tab=history" class="nav-link">
+        <a href="history.html" class="nav-link">
           <i data-lucide="scroll" class="w-4 h-4"></i>
           سير الأعلام
         </a>
-        <a href="index.html?tab=jarh" class="nav-link">
-          <i data-lucide="scale" class="w-4 h-4"></i>
-          الجرح والتعديل
-        </a>
-        <a href="index.html?tab=fatawa" class="nav-link active">
+        <a href="algolia-search.html" class="nav-link active">
           <i data-lucide="book" class="w-4 h-4"></i>
           موسوعة الفتاوى
         </a>
-        <a href="index.html?tab=firebase" class="nav-link">
+        <a href="firebase-search.html" class="nav-link">
           <i data-lucide="database" class="w-4 h-4"></i>
           بحث Firebase
         </a>
@@ -93,7 +89,7 @@
   </div>
 
   <footer class="site-footer">
-    <p>&copy; 2025 موسوعة البيان. جميع الحقوق محفوظة.</p>
+    <p>&copy; 2025 الموسوعة الشاملة. جميع الحقوق محفوظة.</p>
   </footer>
 
   <div class="fab-container reader-fabs print:hidden">
@@ -111,7 +107,6 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-    import { updateSEO } from './seo_optimizer.js';
 
     const firebaseConfig = {
       apiKey: "AIzaSyC9kI6aUcgHokt7e20TOL1IQpA9M7r15pc",
@@ -126,13 +121,13 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    const PLACEHOLDER_DOMAIN = 'https://fatawa-seo-eanp.vercel.app';
-    const FATWA_PAGE = '/fatwa_';
+    const PLACEHOLDER_DOMAIN = 'https://your-site.com';
+    const FATWA_PAGE = 'fatwa.html';
 
     const stripPlaceholderDomain = (value = '') => value ? value.split(PLACEHOLDER_DOMAIN).join('') : '';
     const hasHTMLMarkup = (value = '') => /<\/?[a-z][\s\S]*>/i.test(value);
 
-    const buildFatwaDetailUrl = (id) => id ? `${FATWA_PAGE}${encodeURIComponent(id)}` : '#';
+    const buildFatwaDetailUrl = (id) => id ? `${FATWA_PAGE}?id=${encodeURIComponent(id)}` : '#';
 
     const rewriteFatwaHref = (href = '') => {
       if (!href) return href;
@@ -184,13 +179,7 @@
     const backToResultsBtn = document.getElementById('backToResults');
 
     const params = new URLSearchParams(window.location.search);
-    let requestedId = params.get('id');
-    if (!requestedId) {
-      const match = window.location.pathname.match(/\/fatwa[_/]([^\/]+)/i);
-      if (match && match[1]) {
-        requestedId = decodeURIComponent(match[1]).replace(/\.html$/i, '');
-      }
-    }
+    const requestedId = params.get('id');
     const searchTerm = params.get('q') || '';
     let currentFontSize = 24;
 
@@ -252,9 +241,6 @@
       fatwaQuestion.innerHTML = questionHTML;
       fatwaAnswer.innerHTML = renderRichText(data.answer, { wrapParagraphs: true, fallback: '<p>لا يوجد نص للجواب.</p>' });
       metaBar.innerHTML = buildMeta(data);
-      
-      updateSEO(data.question || 'فتوى رقم ' + data.id, data.answer || 'محتوى الفتوى', window.location.href, 'Article');
-
       viewContainer.classList.remove('hidden');
       loadingSpinner.classList.add('hidden');
       errorState.classList.add('hidden');
@@ -339,8 +325,7 @@
 
     function buildMeta(data) {
       const parts = [];
-      const cleanId = String(data.id || '').replace('fatwa/', '');
-      if (data.id) parts.push(`<span class="reader-meta-pill">رقم الفتوى: ${cleanId}</span>`);
+      if (data.id) parts.push(`<span class="reader-meta-pill">فتوى رقم ${data.id}</span>`);
       if (data.source) parts.push(`<span class="reader-meta-pill" style="background:rgba(16,185,129,0.12);color:#047857;">${data.source}</span>`);
       return parts.join('');
     }
