@@ -248,7 +248,9 @@
         let docId = params.get("id");
         if (!docId) {
             const match = window.location.pathname.match(/\/jarh_([^\/]+)/i);
-            if (match && match[1]) docId = decodeURIComponent(match[1]);
+            if (match && match[1]) {
+                docId = decodeURIComponent(match[1]).replace(/\.html$/i, '');
+            }
         }
 
         const loadingSpinner = document.getElementById('loadingSpinner');

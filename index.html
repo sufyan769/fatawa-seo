@@ -526,7 +526,7 @@
           title = getHighlighted(hit, 'question', stripPlaceholderDomain(hit.question || "فتوى"));
           const answerPreview = stripPlaceholderDomain(hit.answer_snippet || hit.answer || hit.text || "لا يوجد نص للجواب.");
           snippet = getHighlighted(hit, 'answer', truncateText(answerPreview, 220));
-          link = buildFatwaDetailUrl(fatwaId) + `&q=${encodeURIComponent(term)}`;
+          link = buildFatwaDetailUrl(fatwaId) + (term ? `?q=${encodeURIComponent(term)}` : '');
           meta = `<span class="badge badge-info">فتوى</span> ${hit.source ? hit.source.replace('.html', '') : ''}`;
         } else if (type === 'firebase') {
           title = highlightText(hit.name || "سيرة معرفية", term);

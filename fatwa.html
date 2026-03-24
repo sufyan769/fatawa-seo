@@ -187,7 +187,9 @@
     let requestedId = params.get('id');
     if (!requestedId) {
       const match = window.location.pathname.match(/\/fatwa_([^\/]+)/i);
-      if (match && match[1]) requestedId = decodeURIComponent(match[1]);
+      if (match && match[1]) {
+        requestedId = decodeURIComponent(match[1]).replace(/\.html$/i, '');
+      }
     }
     const searchTerm = params.get('q') || '';
     let currentFontSize = 24;

@@ -168,7 +168,9 @@
         let docId = params.get("id");
         if (!docId) {
             const match = window.location.pathname.match(/\/hadith_([^\/]+)/i);
-            if (match && match[1]) docId = decodeURIComponent(match[1]);
+            if (match && match[1]) {
+                docId = decodeURIComponent(match[1]).replace(/\.html$/i, '');
+            }
         }
         const searchTerm = params.get("q");
 
