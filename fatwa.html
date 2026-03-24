@@ -93,7 +93,7 @@
   </div>
 
   <footer class="site-footer">
-    <p>&copy; 2025 الموسوعة الشاملة. جميع الحقوق محفوظة.</p>
+    <p>&copy; 2025 موسوعة البيان. جميع الحقوق محفوظة.</p>
   </footer>
 
   <div class="fab-container reader-fabs print:hidden">
@@ -126,13 +126,13 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    const PLACEHOLDER_DOMAIN = 'https://fatawa-seo.vercel.app';
-    const FATWA_PAGE = 'fatwa.html';
+    const PLACEHOLDER_DOMAIN = 'https://fatawa-seo-eanp.vercel.app';
+    const FATWA_PAGE = '/fatwa/';
 
     const stripPlaceholderDomain = (value = '') => value ? value.split(PLACEHOLDER_DOMAIN).join('') : '';
     const hasHTMLMarkup = (value = '') => /<\/?[a-z][\s\S]*>/i.test(value);
 
-    const buildFatwaDetailUrl = (id) => id ? `${FATWA_PAGE}?id=${encodeURIComponent(id)}` : '#';
+    const buildFatwaDetailUrl = (id) => id ? `${FATWA_PAGE}${encodeURIComponent(id)}` : '#';
 
     const rewriteFatwaHref = (href = '') => {
       if (!href) return href;
@@ -337,7 +337,8 @@
 
     function buildMeta(data) {
       const parts = [];
-      if (data.id) parts.push(`<span class="reader-meta-pill">فتوى رقم ${data.id}</span>`);
+      const cleanId = String(data.id || '').replace('fatwa/', '');
+      if (data.id) parts.push(`<span class="reader-meta-pill">رقم الفتوى: ${cleanId}</span>`);
       if (data.source) parts.push(`<span class="reader-meta-pill" style="background:rgba(16,185,129,0.12);color:#047857;">${data.source}</span>`);
       return parts.join('');
     }

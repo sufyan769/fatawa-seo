@@ -248,7 +248,7 @@
         <button type="submit" class="search-btn">
           <i data-lucide="search" class="w-6 h-6"></i>
         </button>
-        <input id="searchInput" type="text" class="search-input" placeholder="اكتب سؤالك الشرعي..." autocomplete="off">
+        <input id="searchInput" type="text" class="search-input" placeholder="ابحث في موسوعة البيان..." autocomplete="off">
       </form>
     </section>
 
@@ -269,7 +269,7 @@
   </main>
 
   <footer class="site-footer">
-    <p>&copy; 2025 الموسوعة الشاملة. جميع الحقوق محفوظة.</p>
+    <p>&copy; 2025 موسوعة البيان. جميع الحقوق محفوظة.</p>
   </footer>
 
   <script type="module">
@@ -290,16 +290,16 @@
 
     let currentHits = [];
 
-    const PLACEHOLDER_DOMAIN = 'https://fatawa-seo.vercel.app';
-    const FATWA_PAGE = 'fatwa.html';
+    const PLACEHOLDER_DOMAIN = 'https://fatawa-seo-eanp.vercel.app';
+    const FATWA_PAGE = '/fatwa/';
 
     const stripPlaceholderDomain = (value = '') => value ? value.split(PLACEHOLDER_DOMAIN).join('') : '';
     const hasHTMLMarkup = (value = '') => /<\/?[a-z][\s\S]*>/i.test(value);
 
     const buildFatwaDetailUrl = (id, query = '') => {
-      let url = id ? `${FATWA_PAGE}?id=${encodeURIComponent(id)}` : '#';
+      let url = id ? `${FATWA_PAGE}${encodeURIComponent(id)}` : '#';
       if (query && id) {
-        url += `&q=${encodeURIComponent(query)}`;
+        url += `?q=${encodeURIComponent(query)}`;
       }
       return url;
     };
