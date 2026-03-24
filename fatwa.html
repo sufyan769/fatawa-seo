@@ -186,7 +186,7 @@
     const params = new URLSearchParams(window.location.search);
     let requestedId = params.get('id');
     if (!requestedId) {
-      const match = window.location.pathname.match(/\/fatwa_([^\/]+)/i);
+      const match = window.location.pathname.match(/\/fatwa[_/]([^\/]+)/i);
       if (match && match[1]) {
         requestedId = decodeURIComponent(match[1]).replace(/\.html$/i, '');
       }
