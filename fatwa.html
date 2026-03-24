@@ -5,14 +5,25 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>تفاصيل الفتوى - موسوعة البيان</title>
+  
+  <!-- Preconnect to critical domains -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://www.gstatic.com">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  
   <link
     href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Noto+Naskh+Arabic:wght@400;700&display=swap"
-    rel="stylesheet">
+    rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Noto+Naskh+Arabic:wght@400;700&display=swap" rel="stylesheet">
+  </noscript>
+
   <link rel="stylesheet" href="style.css">
   <link rel="canonical" href="https://fatawa-seo-eanp.vercel.app/fatwa.html" />
-  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- Defer non-critical scripts -->
+  <script src="https://unpkg.com/lucide@latest" defer></script>
 </head>
 
 <body class="reader-body">
@@ -76,11 +87,11 @@
     </header>
 
     <div class="reader-controls">
-      <button id="copyBtn" class="btn btn-secondary">
+      <button id="copyBtn" class="btn btn-secondary" aria-label="نسخ الجواب">
         <i data-lucide="copy" class="w-4 h-4"></i>
         <span>نسخ الجواب</span>
       </button>
-      <button id="shareBtn" class="btn btn-primary">
+      <button id="shareBtn" class="btn btn-primary" aria-label="مشاركة">
         <i data-lucide="share-2" class="w-4 h-4"></i>
         <span>مشاركة</span>
       </button>
@@ -94,13 +105,13 @@
   </footer>
 
   <div class="fab-container reader-fabs print:hidden">
-    <button id="increaseFont" class="fab primary" title="تكبير النص">
+    <button id="increaseFont" class="fab primary" aria-label="تكبير النص" title="تكبير النص">
       <i data-lucide="zoom-in" class="w-5 h-5"></i>
     </button>
-    <button id="decreaseFont" class="fab" title="تصغير النص">
+    <button id="decreaseFont" class="fab" aria-label="تصغير النص" title="تصغير النص">
       <i data-lucide="zoom-out" class="w-5 h-5"></i>
     </button>
-    <button id="backToResults" class="fab" title="العودة لنتائج البحث">
+    <button id="backToResults" class="fab" aria-label="العودة لنتائج البحث" title="العودة لنتائج البحث">
       <i data-lucide="arrow-right" class="w-5 h-5"></i>
     </button>
   </div>
@@ -185,7 +196,7 @@
     let currentFontSize = 24;
 
     document.addEventListener('DOMContentLoaded', () => {
-      lucide.createIcons();
+      if (window.lucide) lucide.createIcons();
       if (!requestedId) {
         showError('لم يتم تمرير رقم الفتوى.');
         return;

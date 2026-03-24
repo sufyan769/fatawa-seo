@@ -46,17 +46,23 @@
     }
   </script>
 
-  <!-- Google Fonts -->
+  <!-- Preconnect to critical domains -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://www.gstatic.com">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  
   <link
     href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Noto+Naskh+Arabic:wght@400;700&display=swap"
-    rel="stylesheet">
-
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
+    rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Noto+Naskh+Arabic:wght@400;700&display=swap" rel="stylesheet">
+  </noscript>
 
   <link rel="stylesheet" href="style.css">
+  
+  <!-- Defer non-critical scripts -->
+  <script src="https://unpkg.com/lucide@latest" defer></script>
 </head>
 
 <body>
@@ -111,7 +117,7 @@
       </div>
 
       <form id="searchForm" class="search-input-wrapper search-input-wrapper--full">
-        <button type="submit" class="search-btn">
+        <button type="submit" class="search-btn" aria-label="بحث">
           <i data-lucide="search" class="w-6 h-6"></i>
         </button>
         <input id="searchInput" type="text" class="search-input"
@@ -264,7 +270,7 @@
     let currentTab = PLACEHOLDERS[paramTab] ? paramTab : 'all';
 
     document.addEventListener('DOMContentLoaded', () => {
-      lucide.createIcons();
+      if (window.lucide) lucide.createIcons();
       const cachedResults = sessionStorage.getItem('lastSearchResults');
       const cachedTerm = sessionStorage.getItem('lastSearchTerm');
       const cachedTab = sessionStorage.getItem('lastActiveTab');
