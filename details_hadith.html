@@ -12,6 +12,7 @@
         rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="style.css">
+    <link rel="canonical" href="https://fatawa-seo-eanp.vercel.app/details_hadith.html" />
 </head>
 
 <body class="reader-body">
@@ -314,6 +315,7 @@
         }
 
         function renderView(data) {
+            updateSEO(data);
             // Clear previous content
             if (metaBar) metaBar.innerHTML = '';
             if (viewText) viewText.innerHTML = '';
@@ -457,6 +459,35 @@
             }
 
             updateFontSize();
+        }
+
+        function updateSEO(data) {
+            if (!data) return;
+            const title = `الحديث: ${data.text ? data.text.substring(0, 60) : 'تفاصيل الحديث'} - موسوعة البيان`;
+            const description = data.text ? data.text.substring(0, 160) : 'تفاصيل الحديث الشريف من موسوعة البيان.';
+            
+            document.title = title;
+            
+            // Update Meta Description
+            let metaDesc = document.querySelector('meta[name="description"]');
+            if (!metaDesc) {
+                metaDesc = document.createElement('meta');
+                metaDesc.name = 'description';
+                document.head.appendChild(metaDesc);
+            }
+            metaDesc.content = description;
+            
+            // Update Open Graph
+            const ogTitle = document.querySelector('meta[property="og:title"]');
+            if (ogTitle) ogTitle.content = title;
+            const ogDesc = document.querySelector('meta[property="og:description"]');
+            if (ogDesc) ogDesc.content = description;
+            
+            // Update Canonical with ID
+            let canonical = document.querySelector('link[rel="canonical"]');
+            if (canonical) {
+                canonical.href = `https://fatawa-seo-eanp.vercel.app/details_hadith.html?id=${data.objectID || docId}`;
+            }
         }
 
         function highlightTerms(element, term) {

@@ -11,6 +11,7 @@
     href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Noto+Naskh+Arabic:wght@400;700&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <link rel="canonical" href="https://fatawa-seo-eanp.vercel.app/fatwa.html" />
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
@@ -276,6 +277,32 @@
           highlightTerms(fatwaQuestion, searchTerm);
           highlightTerms(fatwaAnswer, searchTerm);
         }, 100);
+      }
+      updateSEO(data);
+    }
+
+    function updateSEO(data) {
+      if (!data) return;
+      const title = `سؤال: ${data.question ? data.question.substring(0, 60) : 'فتوى'} - موسوعة البيان`;
+      const description = data.answer ? data.answer.substring(0, 160) : 'تفاصيل الفتوى من موسوعة البيان.';
+      document.title = title;
+      
+      let metaDesc = document.querySelector('meta[name="description"]');
+      if (!metaDesc) {
+        metaDesc = document.createElement('meta');
+        metaDesc.name = 'description';
+        document.head.appendChild(metaDesc);
+      }
+      metaDesc.content = description;
+      
+      let ogTitle = document.querySelector('meta[property="og:title"]');
+      if (ogTitle) ogTitle.content = title;
+      let ogDesc = document.querySelector('meta[property="og:description"]');
+      if (ogDesc) ogDesc.content = description;
+      
+      let canonical = document.querySelector('link[rel="canonical"]');
+      if (canonical) {
+        canonical.href = `https://fatawa-seo-eanp.vercel.app/fatwa.html?id=${data.id || requestedId}`;
       }
     }
 

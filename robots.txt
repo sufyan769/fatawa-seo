@@ -1,5 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://sufyan769.github.io/-bayan/sitemap.xml
-Sitemap: https://fatawa-seo-eanp.vercel.app/sitemap.xml
+Sitemap: https://fatawa-seo-eanp.vercel.app/sitemap_index.xml

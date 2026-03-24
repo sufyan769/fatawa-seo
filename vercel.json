@@ -1,12 +1,24 @@
 {
   "rewrites": [
     {
-      "source": "/fatwa/:id",
-      "destination": "/index.html"
+      "source": "/fatwa_pages/fatwa_:id.html",
+      "destination": "/fatwa.html?id=:id"
     },
     {
-      "source": "/:path*",
-      "destination": "/index.html"
+      "source": "/fatwa/:id",
+      "destination": "/fatwa.html?id=:id"
+    },
+    {
+      "source": "/hadith/:id",
+      "destination": "/details_hadith.html?id=:id"
+    },
+    {
+      "source": "/scholar/:id",
+      "destination": "/details_scholars.html?id=:id"
+    },
+    {
+      "source": "/history/:id",
+      "destination": "/history.html?id=:id"
     }
   ]
 }
