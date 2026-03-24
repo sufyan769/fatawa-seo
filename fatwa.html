@@ -98,6 +98,15 @@
     </div>
 
     <article id="fatwaAnswer" class="article-text"></article>
+    
+    <!-- Related Fatwas Section -->
+    <section id="relatedFatwas" class="related-section hidden">
+      <h2 class="related-title">
+        <i data-lucide="layers" class="w-6 h-6"></i>
+        <span>فتاوى ذات صلة</span>
+      </h2>
+      <div id="relatedGrid" class="related-grid"></div>
+    </section>
   </div>
 
   <footer class="site-footer">
@@ -119,6 +128,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import algoliasearch from 'https://cdn.jsdelivr.net/npm/algoliasearch@4.22.1/dist/algoliasearch-lite.esm.browser.js';
 
     const firebaseConfig = {
       apiKey: "AIzaSyC9kI6aUcgHokt7e20TOL1IQpA9M7r15pc",
@@ -289,7 +299,79 @@
           highlightTerms(fatwaAnswer, searchTerm);
         }, 100);
       }
+      
+      // Load Related Fatwas
+      if (data.question) {
+        loadRelatedFatwas(data.question, data.id || requestedId);
+      }
+      
       updateSEO(data);
+    }
+
+    async function loadRelatedFatwas(question, currentId) {
+      console.log('Loading related fatwas for ID:', currentId);
+      const ALGOLIA_APP_ID = '3XD12I7386';
+      const ALGOLIA_API_KEY = '89e8e132a05fdb02275f64dec8d14d05';
+      const ALGOLIA_INDEX = 'alfatawa';
+      
+      const relatedSection = document.getElementById('relatedFatwas');
+      const relatedGrid = document.getElementById('relatedGrid');
+      
+      try {
+        const client = algoliasearch(ALGOLIA_APP_ID, ALGOLIA_API_KEY);
+        const algoliaIndex = client.initIndex(ALGOLIA_INDEX);
+        
+        // Advanced cleaning
+        const stopWords = ['الإخوة', 'الكرام', 'سررت', 'باستلام', 'جوابكم', 'بعد', 'طول', 'انتظار', 'السلام', 'عليكم', 'ورحمة', 'الله', 'وبركاته', 'تحية', 'طيبة', 'وبعد', 'سؤالي', 'هو', 'أما', 'يرجى', 'إفادتي', 'هل', 'يجوز', 'حكم', 'ما', 'ماذا', 'كيف', 'في', 'من', 'على'];
+        
+        let words = question.replace(/[.،,؟!]/g, ' ').split(/\s+/).filter(w => w.length > 3 && !stopWords.includes(w));
+        
+        // Take up to 10 unique keywords
+        let keywords = [...new Set(words)].slice(0, 10).join(' ');
+        
+        if (!keywords || keywords.length < 5) {
+          // Fallback to first line if keywords fail
+          keywords = question.split('\n')[0].substring(0, 60);
+        }
+
+        console.log('Optimized search keywords:', keywords);
+        
+        const { hits } = await algoliaIndex.search(keywords, {
+          hitsPerPage: 20,
+          optionalWords: keywords.split(' ')
+        });
+        
+        console.log('Algolia matches found:', hits.length);
+        
+        let filtered = hits.filter(h => String(h.objectID || h.id) !== String(currentId)).slice(0, 7);
+        
+        if (filtered.length === 0 && keywords.split(' ').length > 2) {
+            console.log('Attempting broader search...');
+            const { hits: broadHits } = await algoliaIndex.search(keywords.split(' ').slice(0, 3).join(' '), { hitsPerPage: 10 });
+            filtered = broadHits.filter(h => String(h.objectID || h.id) !== String(currentId)).slice(0, 7);
+        }
+
+        if (filtered.length > 0) {
+          relatedGrid.innerHTML = filtered.map(item => {
+            const id = item.objectID || item.id;
+            const qText = (item.question || item.title || '').split('\n')[0].trim();
+            return `
+              <a href="fatwa.html?id=${encodeURIComponent(id)}" class="related-card" style="display: flex; gap: 12px; align-items: center; padding: 12px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 8px; text-decoration: none;">
+                <i data-lucide="file-text" class="w-5 h-5" style="color: #027d8d; flex-shrink: 0;"></i>
+                <span style="color: #027d8d; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'Amiri', serif; font-size: 1.2rem;">${qText}</span>
+              </a>
+            `;
+          }).join('');
+          
+          relatedSection.classList.remove('hidden');
+          relatedSection.style.display = 'block';
+          if (window.lucide) lucide.createIcons();
+        } else {
+          console.log('No related content found even after fallbacks.');
+        }
+      } catch (err) {
+        console.error('Related fatwas error:', err);
+      }
     }
 
     function updateSEO(data) {
