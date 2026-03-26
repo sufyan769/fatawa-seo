@@ -8,6 +8,10 @@
   ],
   "rewrites": [
     {
+      "source": "/fatwa",
+      "destination": "/fatwa.html"
+    },
+    {
       "source": "/fatwa/:id",
       "destination": "/fatwa.html?id=:id"
     },
@@ -18,6 +22,10 @@
     {
       "source": "/scholar/:id",
       "destination": "/details_scholars.html?id=:id"
+    },
+    {
+      "source": "/history",
+      "destination": "/history.html"
     },
     {
       "source": "/history/:id",

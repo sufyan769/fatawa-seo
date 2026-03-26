@@ -81,7 +81,6 @@
           <i data-lucide="book-open-check" class="w-4 h-4"></i>
           الحديث الشريف
         </a>
-
         <a href="index.html?tab=scholars" class="nav-link" data-nav-tab="scholars">
           <i data-lucide="users" class="w-4 h-4"></i>
           تراجم العلماء
@@ -225,12 +224,12 @@
       }
     };
 
-    const PLACEHOLDER_DOMAIN = 'https://your-site.com';
+    const PLACEHOLDER_DOMAIN = 'https://fatawa-seo-eanp.vercel.app';
     const FATWA_PAGE = 'fatwa.html';
 
     const stripPlaceholderDomain = (value = '') => value ? value.split(PLACEHOLDER_DOMAIN).join('') : '';
     const truncateText = (text = '', length = 220) => text.length > length ? `${text.substring(0, length)}...` : text;
-    const buildFatwaDetailUrl = (id) => id ? `${FATWA_PAGE}?id=${encodeURIComponent(id)}` : '#';
+    const buildFatwaDetailUrl = (id) => id ? `/fatwa/${encodeURIComponent(id)}` : '#';
 
     const app = initializeApp(CONFIG.firebase);
     const db = getFirestore(app);
@@ -523,19 +522,19 @@
           if (pageNum) metaParts.push(`<strong style="color: #8d6e63;">رقم/صفحة:</strong> <span style="color: #8d6e63;">${pageNum}</span>`);
 
           snippet = metaParts.length > 0 ? metaParts.join(' • ') : '';
-          link = `details_hadith.html?id=${hit.objectID}&q=${encodeURIComponent(term)}`;
+          link = `/hadith/${hit.objectID}?q=${encodeURIComponent(term)}`;
           meta = `<span class="badge badge-info">حديث</span>`;
         } else if (type === 'scholars') {
           title = getHighlighted(hit, 'name', hit.name || "بطاقة تراجم");
           snippet = getHighlighted(hit, 'trj', hit.trj ? hit.trj.substring(0, 200) + "..." : "");
           const docId = hit.objectID || hit.id;
-          link = `details_scholars.html?id=${docId}&q=${encodeURIComponent(term)}`;
+          link = `/scholar/${docId}?q=${encodeURIComponent(term)}`;
           meta = `<span class="badge badge-info">تراجم</span> ${hit.death ? 'توفي: ' + hit.death : ''}`;
         } else if (type === 'history') {
           title = getHighlighted(hit, 'name', hit.name || "بدون عنوان");
           const content = hit.full_intro || hit.text || "";
           snippet = getHighlighted(hit, 'full_intro', content.substring(0, 200) + "...");
-          link = `history.html?id=${hit.objectID}&q=${encodeURIComponent(term)}`;
+          link = `/history/${hit.objectID}?q=${encodeURIComponent(term)}`;
           meta = `<span class="badge badge-warning">سير الأعلام</span>`;
         } else if (type === 'fatawa') {
           const fatwaId = hit.objectID || hit.id || '';

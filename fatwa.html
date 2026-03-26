@@ -46,15 +46,19 @@
           <i data-lucide="users" class="w-4 h-4"></i>
           تراجم العلماء
         </a>
-        <a href="history.html" class="nav-link">
+        <a href="index.html?tab=history" class="nav-link">
           <i data-lucide="scroll" class="w-4 h-4"></i>
           سير الأعلام
         </a>
-        <a href="algolia-search.html" class="nav-link active">
+        <a href="index.html?tab=jarh" class="nav-link">
+          <i data-lucide="scale" class="w-4 h-4"></i>
+          الجرح والتعديل
+        </a>
+        <a href="index.html?tab=fatawa" class="nav-link active">
           <i data-lucide="book" class="w-4 h-4"></i>
           موسوعة الفتاوى
         </a>
-        <a href="firebase-search.html" class="nav-link">
+        <a href="index.html?tab=firebase" class="nav-link">
           <i data-lucide="database" class="w-4 h-4"></i>
           بحث Firebase
         </a>
@@ -64,7 +68,7 @@
 
   <section class="reader-toolbar">
     <div class="container-fluid">
-      <button onclick="window.location.href='algolia-search.html'" class="reader-return">
+      <button onclick="if(document.referrer.includes('fatawa') || document.referrer.includes('index')) { history.back(); } else { window.location.href='index.html?tab=fatawa'; }" class="reader-return">
         <i data-lucide="arrow-right" class="w-4 h-4"></i>
         <span>العودة إلى نتائج الفتاوى</span>
       </button>
@@ -147,7 +151,7 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    const PLACEHOLDER_DOMAIN = 'https://your-site.com';
+    const PLACEHOLDER_DOMAIN = 'https://fatawa-seo-eanp.vercel.app';
     const FATWA_PAGE = 'fatwa.html';
 
     const stripPlaceholderDomain = (value = '') => value ? value.split(PLACEHOLDER_DOMAIN).join('') : '';
@@ -233,7 +237,7 @@
     });
 
     backToResultsBtn.addEventListener('click', () => {
-      if (document.referrer && document.referrer.includes('algolia-search')) {
+      if (document.referrer && (document.referrer.includes('algolia-search') || document.referrer.includes('index'))) {
         history.back();
       } else {
         window.location.href = 'index.html?tab=fatawa';

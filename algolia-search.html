@@ -226,15 +226,19 @@
           <i data-lucide="users" class="w-4 h-4"></i>
           تراجم العلماء
         </a>
-        <a href="history.html" class="nav-link">
+        <a href="index.html?tab=history" class="nav-link">
           <i data-lucide="scroll" class="w-4 h-4"></i>
-          البداية والنهاية
+          سير الأعلام
         </a>
-        <a href="algolia-search.html" class="nav-link active">
+        <a href="index.html?tab=jarh" class="nav-link">
+          <i data-lucide="scale" class="w-4 h-4"></i>
+          الجرح والتعديل
+        </a>
+        <a href="index.html?tab=fatawa" class="nav-link active">
           <i data-lucide="book" class="w-4 h-4"></i>
           موسوعة الفتاوى
         </a>
-        <a href="firebase-search.html" class="nav-link">
+        <a href="index.html?tab=firebase" class="nav-link">
           <i data-lucide="database" class="w-4 h-4"></i>
           بحث Firebase
         </a>
@@ -297,16 +301,16 @@
 
     let currentHits = [];
 
-    const PLACEHOLDER_DOMAIN = 'https://your-site.com';
+    const PLACEHOLDER_DOMAIN = 'https://fatawa-seo-eanp.vercel.app';
     const FATWA_PAGE = 'fatwa.html';
 
     const stripPlaceholderDomain = (value = '') => value ? value.split(PLACEHOLDER_DOMAIN).join('') : '';
     const hasHTMLMarkup = (value = '') => /<\/?[a-z][\s\S]*>/i.test(value);
 
     const buildFatwaDetailUrl = (id, query = '') => {
-      let url = id ? `${FATWA_PAGE}?id=${encodeURIComponent(id)}` : '#';
+      let url = id ? `/fatwa/${encodeURIComponent(id)}` : '#';
       if (query && id) {
-        url += `&q=${encodeURIComponent(query)}`;
+        url += `?q=${encodeURIComponent(query)}`;
       }
       return url;
     };
@@ -444,7 +448,7 @@
       if (!filtered.length) return '';
       const chips = filtered.map(cat => {
         const label = typeof cat === 'string' ? cat : String(cat);
-        const href = `algolia-search.html?q=${encodeURIComponent(label)}`;
+        const href = `index.html?tab=fatawa&q=${encodeURIComponent(label)}`;
         return `<a class="fatwa-chip" href="${href}">${label}</a>`;
       }).join('');
       return `<div class="fatwa-card__chips">${chips}</div>`;
