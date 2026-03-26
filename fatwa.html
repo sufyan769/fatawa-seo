@@ -5,29 +5,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>تفاصيل الفتوى - موسوعة البيان</title>
-  
-  <!-- Preconnect to critical domains -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preconnect" href="https://www.gstatic.com">
-  <link rel="preconnect" href="https://cdn.jsdelivr.net">
-  
   <link
     href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Noto+Naskh+Arabic:wght@400;700&display=swap"
-    rel="stylesheet" media="print" onload="this.media='all'">
-  <noscript>
-    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Noto+Naskh+Arabic:wght@400;700&display=swap" rel="stylesheet">
-  </noscript>
-
+    rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-  <link rel="canonical" href="https://fatawa-seo-eanp.vercel.app/fatwa.html" />
-  <meta name="application-name" content="موسوعة البيان">
-  <meta property="og:site_name" content="موسوعة البيان">
-  <meta property="og:type" content="article">
-  <meta name="apple-mobile-web-app-title" content="موسوعة البيان">
-  
-  <!-- Defer non-critical scripts -->
-  <script src="https://unpkg.com/lucide@latest" defer></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
 <body class="reader-body">
@@ -46,19 +30,15 @@
           <i data-lucide="users" class="w-4 h-4"></i>
           تراجم العلماء
         </a>
-        <a href="index.html?tab=history" class="nav-link">
+        <a href="history.html" class="nav-link">
           <i data-lucide="scroll" class="w-4 h-4"></i>
           سير الأعلام
         </a>
-        <a href="index.html?tab=jarh" class="nav-link">
-          <i data-lucide="scale" class="w-4 h-4"></i>
-          الجرح والتعديل
-        </a>
-        <a href="index.html?tab=fatawa" class="nav-link active">
+        <a href="algolia-search.html" class="nav-link active">
           <i data-lucide="book" class="w-4 h-4"></i>
           موسوعة الفتاوى
         </a>
-        <a href="index.html?tab=firebase" class="nav-link">
+        <a href="firebase-search.html" class="nav-link">
           <i data-lucide="database" class="w-4 h-4"></i>
           بحث Firebase
         </a>
@@ -68,7 +48,7 @@
 
   <section class="reader-toolbar">
     <div class="container-fluid">
-      <button onclick="if(document.referrer.includes('fatawa') || document.referrer.includes('index')) { history.back(); } else { window.location.href='index.html?tab=fatawa'; }" class="reader-return">
+      <button onclick="window.location.href='algolia-search.html'" class="reader-return">
         <i data-lucide="arrow-right" class="w-4 h-4"></i>
         <span>العودة إلى نتائج الفتاوى</span>
       </button>
@@ -95,26 +75,17 @@
     </header>
 
     <div class="reader-controls">
-      <button id="copyBtn" class="btn btn-secondary" aria-label="نسخ الجواب">
+      <button id="copyBtn" class="btn btn-secondary">
         <i data-lucide="copy" class="w-4 h-4"></i>
         <span>نسخ الجواب</span>
       </button>
-      <button id="shareBtn" class="btn btn-primary" aria-label="مشاركة">
+      <button id="shareBtn" class="btn btn-primary">
         <i data-lucide="share-2" class="w-4 h-4"></i>
         <span>مشاركة</span>
       </button>
     </div>
 
     <article id="fatwaAnswer" class="article-text"></article>
-    
-    <!-- Related Fatwas Section -->
-    <section id="relatedFatwas" class="related-section hidden">
-      <h2 class="related-title">
-        <i data-lucide="layers" class="w-6 h-6"></i>
-        <span>فتاوى ذات صلة</span>
-      </h2>
-      <div id="relatedGrid" class="related-grid"></div>
-    </section>
   </div>
 
   <footer class="site-footer">
@@ -122,13 +93,13 @@
   </footer>
 
   <div class="fab-container reader-fabs print:hidden">
-    <button id="increaseFont" class="fab primary" aria-label="تكبير النص" title="تكبير النص">
+    <button id="increaseFont" class="fab primary" title="تكبير النص">
       <i data-lucide="zoom-in" class="w-5 h-5"></i>
     </button>
-    <button id="decreaseFont" class="fab" aria-label="تصغير النص" title="تصغير النص">
+    <button id="decreaseFont" class="fab" title="تصغير النص">
       <i data-lucide="zoom-out" class="w-5 h-5"></i>
     </button>
-    <button id="backToResults" class="fab" aria-label="العودة لنتائج البحث" title="العودة لنتائج البحث">
+    <button id="backToResults" class="fab" title="العودة لنتائج البحث">
       <i data-lucide="arrow-right" class="w-5 h-5"></i>
     </button>
   </div>
@@ -136,7 +107,6 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-    import algoliasearch from 'https://cdn.jsdelivr.net/npm/algoliasearch@4.22.1/dist/algoliasearch-lite.esm.browser.js';
 
     const firebaseConfig = {
       apiKey: "AIzaSyC9kI6aUcgHokt7e20TOL1IQpA9M7r15pc",
@@ -151,7 +121,7 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    const PLACEHOLDER_DOMAIN = 'https://fatawa-seo-eanp.vercel.app';
+    const PLACEHOLDER_DOMAIN = 'https://your-site.com';
     const FATWA_PAGE = 'fatwa.html';
 
     const stripPlaceholderDomain = (value = '') => value ? value.split(PLACEHOLDER_DOMAIN).join('') : '';
@@ -209,18 +179,12 @@
     const backToResultsBtn = document.getElementById('backToResults');
 
     const params = new URLSearchParams(window.location.search);
-    let requestedId = params.get('id');
-
-    // Fallback for clean URLs like /fatwa/123
-    if (!requestedId && window.location.pathname.includes('/fatwa/')) {
-      const parts = window.location.pathname.split('/fatwa/');
-      requestedId = parts[parts.length - 1].split('/')[0];
-    }
+    const requestedId = params.get('id');
     const searchTerm = params.get('q') || '';
     let currentFontSize = 24;
 
     document.addEventListener('DOMContentLoaded', () => {
-      if (window.lucide) lucide.createIcons();
+      lucide.createIcons();
       if (!requestedId) {
         showError('لم يتم تمرير رقم الفتوى.');
         return;
@@ -243,7 +207,7 @@
     });
 
     backToResultsBtn.addEventListener('click', () => {
-      if (document.referrer && (document.referrer.includes('algolia-search') || document.referrer.includes('index'))) {
+      if (document.referrer && document.referrer.includes('algolia-search')) {
         history.back();
       } else {
         window.location.href = 'index.html?tab=fatawa';
@@ -312,104 +276,6 @@
           highlightTerms(fatwaQuestion, searchTerm);
           highlightTerms(fatwaAnswer, searchTerm);
         }, 100);
-      }
-      
-      // Load Related Fatwas
-      if (data.question) {
-        loadRelatedFatwas(data.question, data.id || requestedId);
-      }
-      
-      updateSEO(data);
-    }
-
-    async function loadRelatedFatwas(question, currentId) {
-      console.log('Loading related fatwas for ID:', currentId);
-      const ALGOLIA_APP_ID = '3XD12I7386';
-      const ALGOLIA_API_KEY = '89e8e132a05fdb02275f64dec8d14d05';
-      const ALGOLIA_INDEX = 'alfatawa';
-      
-      const relatedSection = document.getElementById('relatedFatwas');
-      const relatedGrid = document.getElementById('relatedGrid');
-      
-      try {
-        const client = algoliasearch(ALGOLIA_APP_ID, ALGOLIA_API_KEY);
-        const algoliaIndex = client.initIndex(ALGOLIA_INDEX);
-        
-        // Advanced cleaning
-        const stopWords = ['الإخوة', 'الكرام', 'سررت', 'باستلام', 'جوابكم', 'بعد', 'طول', 'انتظار', 'السلام', 'عليكم', 'ورحمة', 'الله', 'وبركاته', 'تحية', 'طيبة', 'وبعد', 'سؤالي', 'هو', 'أما', 'يرجى', 'إفادتي', 'هل', 'يجوز', 'حكم', 'ما', 'ماذا', 'كيف', 'في', 'من', 'على'];
-        
-        let words = question.replace(/[.،,؟!]/g, ' ').split(/\s+/).filter(w => w.length > 3 && !stopWords.includes(w));
-        
-        // Take up to 10 unique keywords
-        let keywords = [...new Set(words)].slice(0, 10).join(' ');
-        
-        if (!keywords || keywords.length < 5) {
-          // Fallback to first line if keywords fail
-          keywords = question.split('\n')[0].substring(0, 60);
-        }
-
-        console.log('Optimized search keywords:', keywords);
-        
-        const { hits } = await algoliaIndex.search(keywords, {
-          hitsPerPage: 20,
-          optionalWords: keywords.split(' ')
-        });
-        
-        console.log('Algolia matches found:', hits.length);
-        
-        let filtered = hits.filter(h => String(h.objectID || h.id) !== String(currentId)).slice(0, 7);
-        
-        if (filtered.length === 0 && keywords.split(' ').length > 2) {
-            console.log('Attempting broader search...');
-            const { hits: broadHits } = await algoliaIndex.search(keywords.split(' ').slice(0, 3).join(' '), { hitsPerPage: 10 });
-            filtered = broadHits.filter(h => String(h.objectID || h.id) !== String(currentId)).slice(0, 7);
-        }
-
-        if (filtered.length > 0) {
-          relatedGrid.innerHTML = filtered.map(item => {
-            const id = item.objectID || item.id;
-            const qText = (item.question || item.title || '').split('\n')[0].trim();
-            return `
-              <a href="fatwa.html?id=${encodeURIComponent(id)}" class="related-card" style="display: flex; gap: 12px; align-items: center; padding: 12px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 8px; text-decoration: none;">
-                <i data-lucide="file-text" class="w-5 h-5" style="color: #027d8d; flex-shrink: 0;"></i>
-                <span style="color: #027d8d; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'Amiri', serif; font-size: 1.2rem;">${qText}</span>
-              </a>
-            `;
-          }).join('');
-          
-          relatedSection.classList.remove('hidden');
-          relatedSection.style.display = 'block';
-          if (window.lucide) lucide.createIcons();
-        } else {
-          console.log('No related content found even after fallbacks.');
-        }
-      } catch (err) {
-        console.error('Related fatwas error:', err);
-      }
-    }
-
-    function updateSEO(data) {
-      if (!data) return;
-      const title = `سؤال: ${data.question ? data.question.substring(0, 60) : 'فتوى'} - موسوعة البيان`;
-      const description = data.answer ? data.answer.substring(0, 160) : 'تفاصيل الفتوى من موسوعة البيان.';
-      document.title = title;
-      
-      let metaDesc = document.querySelector('meta[name="description"]');
-      if (!metaDesc) {
-        metaDesc = document.createElement('meta');
-        metaDesc.name = 'description';
-        document.head.appendChild(metaDesc);
-      }
-      metaDesc.content = description;
-      
-      let ogTitle = document.querySelector('meta[property="og:title"]');
-      if (ogTitle) ogTitle.content = title;
-      let ogDesc = document.querySelector('meta[property="og:description"]');
-      if (ogDesc) ogDesc.content = description;
-      
-      let canonical = document.querySelector('link[rel="canonical"]');
-      if (canonical) {
-        canonical.href = `https://fatawa-seo-eanp.vercel.app/fatwa.html?id=${data.id || requestedId}`;
       }
     }
 

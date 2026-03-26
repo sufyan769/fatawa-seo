@@ -6,32 +6,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>سير الأعلام - موسوعة البيان</title>
 
-    <!-- Preconnect to critical domains -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://cdn.tailwindcss.com">
-    <link rel="preconnect" href="https://unpkg.com">
-    <link rel="preconnect" href="https://esm.sh">
-
     <!-- Tailwind CSS (CDN) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         // Suppress console warnings and errors
         if (typeof window !== 'undefined') {
+            // Suppress Tailwind CDN warning
             const originalWarn = console.warn;
             console.warn = function (...args) {
                 const msg = args[0];
                 if (msg && typeof msg === 'string') {
+                    // Suppress Tailwind CDN warning
                     if (msg.includes('cdn.tailwindcss.com')) return;
+                    // Suppress Babel transformer warning
                     if (msg.includes('in-browser Babel transformer')) return;
                     if (msg.includes('babeljs.io/docs/setup')) return;
                 }
                 originalWarn.apply(console, args);
             };
 
+            // Suppress Algolia 404 errors during navigation
             const originalError = console.error;
             console.error = function (...args) {
                 const msg = String(args[0] || '');
+                // Suppress Algolia navigation errors (expected when reaching content boundaries)
                 if (msg.includes('algolia') || msg.includes('404')) {
                     return;
                 }
@@ -44,15 +42,14 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Noto+Naskh+Arabic:wght@400;700&display=swap"
-        rel="stylesheet" media="print" onload="this.media='all'">
-    <noscript>
-        <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Noto+Naskh+Arabic:wght@400;700&display=swap" rel="stylesheet">
-    </noscript>
+        rel="stylesheet">
 
     <!-- Lucide Icons (for Navbar) -->
-    <script src="https://unpkg.com/lucide@latest" defer></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
 
     <script>
         tailwind.config = {
@@ -115,15 +112,11 @@
                     <i data-lucide="scroll" class="w-4 h-4"></i>
                     سير الأعلام
                 </a>
-                <a href="index.html?tab=jarh" class="nav-link">
-                    <i data-lucide="scale" class="w-4 h-4"></i>
-                    الجرح والتعديل
-                </a>
-                <a href="index.html?tab=fatawa" class="nav-link">
+                <a href="algolia-search.html" class="nav-link">
                     <i data-lucide="book" class="w-4 h-4"></i>
                     موسوعة الفتاوى
                 </a>
-                <a href="index.html?tab=firebase" class="nav-link">
+                <a href="firebase-search.html" class="nav-link">
                     <i data-lucide="database" class="w-4 h-4"></i>
                     بحث Firebase
                 </a>
@@ -735,14 +728,7 @@
             // Deep Linking Logic
             useEffect(() => {
                 const params = new URLSearchParams(window.location.search);
-                let id = params.get('id');
-
-                // Fallback for clean URLs like /history/123
-                if (!id && window.location.pathname.includes('/history/')) {
-                    const parts = window.location.pathname.split('/history/');
-                    id = parts[parts.length - 1].split('/')[0];
-                }
-
+                const id = params.get('id');
                 if (id) {
                     // Fetch specific object
                     algoliaClient.initIndex(INDEX_NAME).getObject(id)

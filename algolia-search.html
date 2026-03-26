@@ -5,24 +5,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>موسوعة الفتاوى - موسوعة البيان</title>
-  
-  <!-- Preconnect to critical domains -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preconnect" href="https://www.gstatic.com">
-  <link rel="preconnect" href="https://cdn.jsdelivr.net">
-  
   <link
     href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Noto+Naskh+Arabic:wght@400;700&display=swap"
-    rel="stylesheet" media="print" onload="this.media='all'">
-  <noscript>
-    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Noto+Naskh+Arabic:wght@400;700&display=swap" rel="stylesheet">
-  </noscript>
-
+    rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-  
-  <!-- Defer non-critical scripts -->
-  <script src="https://unpkg.com/lucide@latest" defer></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
   <style>
     body {
       font-family: 'Noto Naskh Arabic', sans-serif;
@@ -226,19 +215,15 @@
           <i data-lucide="users" class="w-4 h-4"></i>
           تراجم العلماء
         </a>
-        <a href="index.html?tab=history" class="nav-link">
+        <a href="history.html" class="nav-link">
           <i data-lucide="scroll" class="w-4 h-4"></i>
-          سير الأعلام
+          البداية والنهاية
         </a>
-        <a href="index.html?tab=jarh" class="nav-link">
-          <i data-lucide="scale" class="w-4 h-4"></i>
-          الجرح والتعديل
-        </a>
-        <a href="index.html?tab=fatawa" class="nav-link active">
+        <a href="algolia-search.html" class="nav-link active">
           <i data-lucide="book" class="w-4 h-4"></i>
           موسوعة الفتاوى
         </a>
-        <a href="index.html?tab=firebase" class="nav-link">
+        <a href="firebase-search.html" class="nav-link">
           <i data-lucide="database" class="w-4 h-4"></i>
           بحث Firebase
         </a>
@@ -256,7 +241,7 @@
         </div>
       </div>
       <form id="searchForm" class="search-input-wrapper search-input-wrapper--full">
-        <button type="submit" class="search-btn" aria-label="بحث">
+        <button type="submit" class="search-btn">
           <i data-lucide="search" class="w-6 h-6"></i>
         </button>
         <input id="searchInput" type="text" class="search-input" placeholder="اكتب سؤالك الشرعي..." autocomplete="off">
@@ -301,16 +286,16 @@
 
     let currentHits = [];
 
-    const PLACEHOLDER_DOMAIN = 'https://fatawa-seo-eanp.vercel.app';
+    const PLACEHOLDER_DOMAIN = 'https://your-site.com';
     const FATWA_PAGE = 'fatwa.html';
 
     const stripPlaceholderDomain = (value = '') => value ? value.split(PLACEHOLDER_DOMAIN).join('') : '';
     const hasHTMLMarkup = (value = '') => /<\/?[a-z][\s\S]*>/i.test(value);
 
     const buildFatwaDetailUrl = (id, query = '') => {
-      let url = id ? `/fatwa/${encodeURIComponent(id)}` : '#';
+      let url = id ? `${FATWA_PAGE}?id=${encodeURIComponent(id)}` : '#';
       if (query && id) {
-        url += `?q=${encodeURIComponent(query)}`;
+        url += `&q=${encodeURIComponent(query)}`;
       }
       return url;
     };
@@ -352,7 +337,7 @@
     };
 
     document.addEventListener('DOMContentLoaded', () => {
-      if (window.lucide) lucide.createIcons();
+      lucide.createIcons();
       const params = new URLSearchParams(window.location.search);
       const term = params.get('q') || '';
       if (term) {
@@ -448,7 +433,7 @@
       if (!filtered.length) return '';
       const chips = filtered.map(cat => {
         const label = typeof cat === 'string' ? cat : String(cat);
-        const href = `index.html?tab=fatawa&q=${encodeURIComponent(label)}`;
+        const href = `algolia-search.html?q=${encodeURIComponent(label)}`;
         return `<a class="fatwa-chip" href="${href}">${label}</a>`;
       }).join('');
       return `<div class="fatwa-card__chips">${chips}</div>`;

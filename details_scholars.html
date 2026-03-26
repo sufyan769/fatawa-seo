@@ -5,25 +5,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>تفاصيل العالم - موسوعة البيان</title>
-    
-    <!-- Preconnect to critical domains -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://www.gstatic.com">
-    <link rel="preconnect" href="https://cdn.jsdelivr.net">
-    
     <link
         href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Noto+Naskh+Arabic:wght@400;700&display=swap"
-        rel="stylesheet" media="print" onload="this.media='all'">
-    <noscript>
-        <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Noto+Naskh+Arabic:wght@400;700&display=swap" rel="stylesheet">
-    </noscript>
-
+        rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="style.css">
-    <link rel="canonical" href="https://fatawa-seo-eanp.vercel.app/details_scholars.html" />
-    
-    <!-- Defer non-critical scripts -->
-    <script src="https://unpkg.com/lucide@latest" defer></script>
 </head>
 
 <body class="reader-body">
@@ -44,19 +32,15 @@
                     <i data-lucide="users" class="w-4 h-4"></i>
                     تراجم العلماء
                 </a>
-                <a href="index.html?tab=history" class="nav-link">
+                <a href="history.html" class="nav-link">
                     <i data-lucide="scroll" class="w-4 h-4"></i>
                     سير الأعلام
                 </a>
-                <a href="index.html?tab=jarh" class="nav-link">
-                    <i data-lucide="scale" class="w-4 h-4"></i>
-                    الجرح والتعديل
-                </a>
-                <a href="index.html?tab=fatawa" class="nav-link">
+                <a href="algolia-search.html" class="nav-link">
                     <i data-lucide="book" class="w-4 h-4"></i>
                     موسوعة الفتاوى
                 </a>
-                <a href="index.html?tab=firebase" class="nav-link">
+                <a href="firebase-search.html" class="nav-link">
                     <i data-lucide="database" class="w-4 h-4"></i>
                     بحث Firebase
                 </a>
@@ -67,7 +51,7 @@
     <div
         style="padding: 10px 0; background: #f8f9fa; border-bottom: 1px solid var(--border-color); position: sticky; top: 60px; z-index: 40;">
         <div class="container-fluid flex justify-between items-center">
-            <button onclick="window.location.href='index.html?tab=scholars'" aria-label="العودة للبحث"
+            <button onclick="window.location.href='index.html?tab=scholars'"
                 class="flex items-center gap-2 text-gray-500 hover:text-[#00538b] transition-colors text-sm font-bold bg-transparent border-none cursor-pointer">
                 <i data-lucide="arrow-right" class="w-4 h-4"></i>
                 <span>العودة للبحث</span>
@@ -91,13 +75,13 @@
     </div>
 
     <div class="fab-container reader-fabs print:hidden">
-        <button id="increaseFont" class="fab primary" aria-label="تكبير النص" title="تكبير النص">
+        <button id="increaseFont" class="fab primary" title="تكبير النص">
             <i data-lucide="zoom-in" class="w-5 h-5"></i>
         </button>
-        <button id="decreaseFont" class="fab" aria-label="تصغير النص" title="تصغير النص">
+        <button id="decreaseFont" class="fab" title="تصغير النص">
             <i data-lucide="zoom-out" class="w-5 h-5"></i>
         </button>
-        <button id="backToResults" class="fab" aria-label="العودة لنتائج البحث" title="العودة لنتائج البحث">
+        <button id="backToResults" class="fab" title="العودة لنتائج البحث">
             <i data-lucide="arrow-right" class="w-5 h-5"></i>
         </button>
     </div>
@@ -123,13 +107,7 @@
         };
 
         const params = new URLSearchParams(window.location.search);
-        let docId = params.get("id");
-
-        // Fallback for clean URLs like /scholar/123
-        if (!docId && window.location.pathname.includes('/scholar/')) {
-            const parts = window.location.pathname.split('/scholar/');
-            docId = parts[parts.length - 1].split('/')[0];
-        }
+        const docId = params.get("id");
         const searchTerm = params.get("q");
 
         const app = initializeApp(CONFIG.firebase, 'scholarsApp');
@@ -147,7 +125,7 @@
         let currentData = null;
         let currentFontSize = 24;
 
-        if (window.lucide) lucide.createIcons();
+        lucide.createIcons();
 
         function updateFontSize() {
             viewText.style.fontSize = `${currentFontSize}px`;
@@ -205,31 +183,6 @@
             } catch (e) { console.error(e); loadingSpinner.innerHTML = "<p class='text-red-500'>حدث خطأ في التحميل</p>"; }
         }
 
-        function updateSEO(data) {
-            if (!data) return;
-            const title = `ترجمة: ${data.name || 'عالم'} - موسوعة البيان`;
-            const description = data.trj ? data.trj.substring(0, 160) : 'ترجمة وسيرة العالم من موسوعة البيان.';
-            document.title = title;
-            
-            let metaDesc = document.querySelector('meta[name="description"]');
-            if (!metaDesc) {
-                metaDesc = document.createElement('meta');
-                metaDesc.name = 'description';
-                document.head.appendChild(metaDesc);
-            }
-            metaDesc.content = description;
-            
-            let ogTitle = document.querySelector('meta[property="og:title"]');
-            if (ogTitle) ogTitle.content = title;
-            let ogDesc = document.querySelector('meta[property="og:description"]');
-            if (ogDesc) ogDesc.content = description;
-            
-            let canonical = document.querySelector('link[rel="canonical"]');
-            if (canonical) {
-                canonical.href = `https://fatawa-seo-eanp.vercel.app/details_scholars.html?id=${data.objectID || docId}`;
-            }
-        }
-
         function highlightTerms(element, term) {
             if (!term || !element) return;
             const terms = term.split(/\s+/).filter(t => t.length > 2);
@@ -263,7 +216,6 @@
         }
 
         function renderView(data) {
-            updateSEO(data);
             metaBar.innerHTML = '';
             viewText.innerHTML = '';
 
