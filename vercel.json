@@ -1,9 +1,12 @@
 {
-  "rewrites": [
+  "redirects": [
     {
       "source": "/fatwa_pages/fatwa_:id.html",
-      "destination": "/fatwa.html?id=:id"
-    },
+      "destination": "/fatwa.html?id=:id",
+      "permanent": true
+    }
+  ],
+  "rewrites": [
     {
       "source": "/fatwa/:id",
       "destination": "/fatwa.html?id=:id"
