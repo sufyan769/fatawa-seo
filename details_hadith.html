@@ -176,7 +176,13 @@
         };
 
         const params = new URLSearchParams(window.location.search);
-        const docId = params.get("id");
+        let docId = params.get("id");
+
+        // Fallback for clean URLs like /hadith/123
+        if (!docId && window.location.pathname.includes('/hadith/')) {
+            const parts = window.location.pathname.split('/hadith/');
+            docId = parts[parts.length - 1].split('/')[0];
+        }
         const searchTerm = params.get("q");
 
         const app = initializeApp(CONFIG.firebase, 'hadithApp');

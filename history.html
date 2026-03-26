@@ -735,7 +735,14 @@
             // Deep Linking Logic
             useEffect(() => {
                 const params = new URLSearchParams(window.location.search);
-                const id = params.get('id');
+                let id = params.get('id');
+
+                // Fallback for clean URLs like /history/123
+                if (!id && window.location.pathname.includes('/history/')) {
+                    const parts = window.location.pathname.split('/history/');
+                    id = parts[parts.length - 1].split('/')[0];
+                }
+
                 if (id) {
                     // Fetch specific object
                     algoliaClient.initIndex(INDEX_NAME).getObject(id)

@@ -209,7 +209,13 @@
     const backToResultsBtn = document.getElementById('backToResults');
 
     const params = new URLSearchParams(window.location.search);
-    const requestedId = params.get('id');
+    let requestedId = params.get('id');
+
+    // Fallback for clean URLs like /fatwa/123
+    if (!requestedId && window.location.pathname.includes('/fatwa/')) {
+      const parts = window.location.pathname.split('/fatwa/');
+      requestedId = parts[parts.length - 1].split('/')[0];
+    }
     const searchTerm = params.get('q') || '';
     let currentFontSize = 24;
 

@@ -30,6 +30,10 @@
     {
       "source": "/history/:id",
       "destination": "/history.html?id=:id"
+    },
+    {
+      "source": "/jarh/:id",
+      "destination": "/details_jarh.html?id=:id"
     }
   ]
 }

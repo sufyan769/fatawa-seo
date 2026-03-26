@@ -244,7 +244,13 @@
         const COLLECTION_NAME = 'scholars';
 
         const params = new URLSearchParams(window.location.search);
-        const docId = params.get("id");
+        let docId = params.get("id");
+
+        // Fallback for clean URLs like /jarh/123
+        if (!docId && window.location.pathname.includes('/jarh/')) {
+            const parts = window.location.pathname.split('/jarh/');
+            docId = parts[parts.length - 1].split('/')[0];
+        }
 
         const loadingSpinner = document.getElementById('loadingSpinner');
         const viewContainer = document.getElementById('viewContainer');
