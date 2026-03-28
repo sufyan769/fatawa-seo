@@ -1,0 +1,20 @@
+{
+  "name": "fatawa-seo",
+  "version": "1.0.0",
+  "description": "Islamic Encyclopedia - Unified search for Hadith, Fatwas, Scholar Biographies, and Islamic databases",
+  "scripts": {
+    "test": "echo \"No tests specified\" && exit 0"
+  },
+  "keywords": [
+    "islamic",
+    "hadith",
+    "fatwa",
+    "scholars",
+    "seo"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@vercel/speed-insights": "^1.1.0"
+  }
+}
